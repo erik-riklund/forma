@@ -74,7 +74,10 @@ npm install forma-compile
 
 ```ts
 import { compile } from 'forma-compiler';
-const html = compile.toFunction(template, { layout })({ user: { name: "Forma" } });
+
+// we assume that `main` is the main template, and `layout` is the layout component
+const compiledFunction = compile.toFunction(main, { layout });
+const renderedHtml = compiledFunction({ user: { name: 'Forma' } });
 ```
 
 ---
