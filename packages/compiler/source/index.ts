@@ -97,6 +97,39 @@ const elements: Record<string, Element> =
   listEnd:
   {
     pattern: /<\/(?:reverse-)?list>/gs, replacement: `\`).join('')}`
+  },
+
+  /**
+   * ?
+   */
+  slot:
+  {
+    pattern: /<slot\s+(\w+)>/gs, replacement: `\${v(parent.__slot_$1)||\``
+  },
+
+  /**
+   * ?
+   */
+  slotEnd:
+  {
+    pattern: /<\/slot>/gs, replacement: '`}'
+  },
+
+  /**
+   * ?
+   */
+  render:
+  {
+    pattern: /<render\s+slot="(\w+)">/gs,
+    replacement: `\${(()=>{self.__slot_$1=()=>\``
+  },
+
+  /**
+   * ?
+   */
+  renderEnd:
+  {
+    pattern: /<\/render>/gs, replacement: `\`})()||''}`
   }
 };
 
@@ -136,14 +169,27 @@ const compileDependencies = (dependencies: Dependencies): string =>
 /**
  * ?
  */
+const parseSlots = (template: Template): string =>
+{
+  const slots = template.matchAll(/<slot\s+(\w+)>/gs);
+
+  return Array.from(slots.map(([, name]) => `'${ name }'`)).join(',');
+};
+
+/**
+ * ?
+ */
 const compileTemplate = (
   template: Template, dependencies: Dependencies = {}): string =>
 {
   let body =
     `self=self||{};parent=parent||{};` +
-    `var v=(t)=>{return typeof t==='function'?t():t};` +
-    compileDependencies(dependencies) +
-    `return \`${ parseElements(template) }\`;`;
+    `self.__slots=[${ parseSlots(template) }];` +
+    `var v=(t)=>typeof t==='function'?t():t;` +
+    compileDependencies(dependencies);
+
+  body += `if(self.__slots.length){self.__children&&self.__children()}`;
+  body += `return \`${ parseElements(template) }\`;`;
 
   return body;
 };

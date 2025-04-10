@@ -112,27 +112,26 @@ it('should render a nested component from inside a list',
   }
 );
 
-it.todo('should render the default slot content',
+it('should render the default slot content',
   () =>
   {
     const layout = '<div><slot main>No content available</slot></div>';
-    const template = '<component layout></component>';
-    // const renderFunction = compile.toFunction(template, { layout });
+    const template = '<component layout>Hello?</component>';
+    const renderFunction = compile.toFunction(template, { layout });
 
-    // expect(renderFunction()).toBe('<div>No content available</div>');
-    console.log(compile.toString(template, { layout }));
+    expect(renderFunction()).toBe('<div>No content available</div>');
   }
 );
 
-it.todo('should render the named slot content',
+it('should render the named slot content',
   () =>
   {
-    // const layout = '<div><slot main>No content available</slot></div>';
-    // const template = '<component layout><render slot="main">Hello world</render></component>';
-    // const renderFunction = compile.toFunction(template, { layout });
+    const layout = '<div><slot main>No content available</slot></div>';
+    const template = '<component layout><render slot="main">Hello world</render></component>';
+    const renderFunction = compile.toFunction(template, { layout });
 
-    // console.log(compile.toString(template, { layout }));
+    console.log(compile.toString(template, { layout }));
 
-    // expect(renderFunction()).toBe('<div>Hello world</div>');
+    expect(renderFunction()).toBe('<div>Hello world</div>');
   }
 );
