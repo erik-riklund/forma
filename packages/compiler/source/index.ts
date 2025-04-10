@@ -186,10 +186,9 @@ const compileTemplate = (
     `self=self||{};parent=parent||{};` +
     `self.__slots=[${ parseSlots(template) }];` +
     `var v=(t)=>typeof t==='function'?t():t;` +
-    compileDependencies(dependencies);
-
-  body += `if(self.__slots.length){self.__children&&self.__children()}`;
-  body += `return \`${ parseElements(template) }\`;`;
+    compileDependencies(dependencies) +
+    `if(self.__slots.length){self.__children&&self.__children()}` +
+    `return \`${ parseElements(template) }\`;`;
 
   return body;
 };

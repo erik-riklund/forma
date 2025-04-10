@@ -25,13 +25,13 @@ it('should return a string when toString is called',
   }
 );
 
-it.skip('should return a string that contains the template when toString is called',
+it('should return a string that contains the template when toString is called',
   () =>
   {
     const template = compile.toString('Hello world');
     const result =
-      '(self,parent)=>{self=self||{};parent=parent||{};' +
-      `var v=(t)=>typeof t==='function'?t():t;return \`Hello world\`;}`;
+      '(self,parent)=>{self=self||{};parent=parent||{};self.__slots=[];var v=(t)=>typeof t===\'function\'?' +
+      't():t;if(self.__slots.length){self.__children&&self.__children()}return `Hello world`;}';
 
     expect(template).toEqual(result);
   }
@@ -47,17 +47,16 @@ it('should block attempts to break out of the template',
   }
 );
 
-it.skip('should compile dependencies correctly',
+it('should compile dependencies correctly',
   () =>
   {
     const dependencies = { foo: 'Hello' };
     const template = compile.toString('Hello world', dependencies);
     const result =
-      `(self,parent)=>{self=self||{};parent=parent||{};` +
-      `var v=(t)=>typeof t==='function'?t():t;` +
-      `var __foo=(self,parent)=>{self=self||{};parent=parent||{};` +
-      `var v=(t)=>typeof t==='function'?t():t;` +
-      `return \`Hello\`;};return \`Hello world\`;}`;
+      '(self,parent)=>{self=self||{};parent=parent||{};self.__slots=[];var v=(t)=>typeof t===\'function\'?' +
+      't():t;var __foo=(self,parent)=>{self=self||{};parent=parent||{};self.__slots=[];var v=(t)=>typeof ' +
+      't===\'function\'?t():t;if(self.__slots.length){self.__children&&self.__children()}return `Hello`;};' +
+      'if(self.__slots.length){self.__children&&self.__children()}return `Hello world`;}';
 
     expect(template).toEqual(result);
   }

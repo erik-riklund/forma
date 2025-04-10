@@ -130,8 +130,6 @@ it('should render the named slot content',
     const template = '<component layout><render slot="main">Hello world</render></component>';
     const renderFunction = compile.toFunction(template, { layout });
 
-    console.log(compile.toString(template, { layout }));
-
     expect(renderFunction()).toBe('<div>Hello world</div>');
   }
 );
