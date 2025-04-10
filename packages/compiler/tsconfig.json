@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "-": [ "./source/index.ts" ],
+      "-*": [ "./source/*.ts", "./source/*" ],
+      "types": [ "./source/index.d.ts" ]
+    }
+  }
+}

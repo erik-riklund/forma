@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "name": "forma",
+  "workspaces": [ "./packages/*" ],
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

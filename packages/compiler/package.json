@@ -1,0 +1,6 @@
+{
+  "type": "module",
+  "name": "@forma/compiler",
+  "version": "1.0.0",
+  "description": "A minimal template compiler with component-like isolation and slot support"
+}
