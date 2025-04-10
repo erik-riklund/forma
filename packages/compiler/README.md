@@ -1,4 +1,5 @@
 # Forma
+### Tiny compiler. Maximum power.
 
 **Forma Compiler** is a ~2kB declarative, component-based JavaScript template compiler.  
 It enables you to create highly efficient, secure, and maintainable server-rendered applications with ease.
