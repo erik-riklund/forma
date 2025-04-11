@@ -48,9 +48,11 @@ npm install forma-compile
 - ✔️ Named slots with fallback  
 - ✔️ Block content  
 - ✔️ List rendering (including reverse mode)
-- ✔️ Default values and safe lookups  
+- ✔️ Default values and safe lookups
+- Self-closing component elements
 - Simple conditional rendering
 - Auto-escaped variables to avoid script injections (with a modifier to allow raw content)
+- Template syntax scan to find errors like missing end tags.
 
 ---
 
