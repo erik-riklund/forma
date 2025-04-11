@@ -1,6 +1,6 @@
 ### Tiny compiler. Maximum power.
 
-**Forma Compiler** is a ~2kB declarative, component-based JavaScript template compiler.  
+**Forma Compiler** is a ~2kB declarative, component-based template compiler.  
 It enables you to create highly efficient, secure, and maintainable server-rendered applications with ease.
 
 Forma combines a minimal footprint with a robust feature set, ensuring your applications are both **lightweight and efficient**—a crucial advantage in modern web development. Designed with a clear focus on server-side rendering, Forma avoids client-side interactivity, making it a perfect fit for scenarios where simplicity and performance are paramount. For client-side interactivity, consider pairing Forma with tools like [Alpine.js](https://alpinejs.dev/), which seamlessly complement its capabilities.
