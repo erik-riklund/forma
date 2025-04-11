@@ -6,13 +6,13 @@ It enables you to create highly efficient, secure, and maintainable server-rende
 
 Forma combines a minimal footprint with a robust feature set, ensuring your applications are both **lightweight and efficient**—a crucial advantage in modern web development. Designed with a clear focus on server-side rendering, Forma avoids client-side interactivity, making it a perfect fit for scenarios where simplicity and performance are paramount. For client-side interactivity, consider pairing Forma with tools like [Alpine.js](https://alpinejs.dev/), which seamlessly complement its capabilities.
 
-[Dive right into the usage examples](EXAMPLES.md) or keep reading to find out more about what Forma Compiler is, and what it can do for your project. 😎
+[Dive right into the usage examples](https://github.com/erik-riklund/forma/blob/main/packages/compiler/EXAMPLES.md) or keep reading to find out more about what Forma Compiler is, and what it can do for your project. 😎
 
 ---
 
 ## 🔦 Highlights
 
-- 📦 **Tiny** — Minimal footprint but packed with features
+- 📦 **Tiny** — minimal footprint
 - 🧼 **Pure** — every template compiles into an isolated render function
 - 💡 **Declarative** — no runtime logic, no surprises
 - ⚙️ **Composable** — build your UI with simple, nested components
@@ -35,7 +35,6 @@ Forma combines a minimal footprint with a robust feature set, ensuring your appl
 
 ## 📦 Installation
 
-Coming soon on npm:
 ```bash
 npm install forma-compile
 ```
@@ -164,10 +163,9 @@ Conditions default to `self.variableName`, but you can use local scoping with `:
 <if condition=": someLocalVariable">...</if>
 ```
 
----
 ### 💡 Examples
 
-[Explore practical examples and usage instructions](EXAMPLES.md) to get started with the Forma Compiler.
+[Explore practical examples and usage instructions](https://github.com/erik-riklund/forma/blob/main/packages/compiler/EXAMPLES.md) to get started.
 
 ---
 
@@ -179,12 +177,8 @@ Conditions default to `self.variableName`, but you can use local scoping with `:
 - ✔️ Variables with default values and safe lookups
 - ✔️ HTML-encoded variables to avoid script injections (with a modifier to allow raw content)
 - ✔️ Simple conditional rendering
-- 🚧 Self-closing element for components without block content
-
-### 🧪 Ideas
-
-- 🤷 Template syntax scan to catch errors like missing end tags before compilation?
-- 🤷 Extendable and customizable template syntax?
+- ✔️ Self-closing element for components without block content
+- 🚧 Switch-like conditional rendering
 
 ---
 
