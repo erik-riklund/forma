@@ -1,8 +1,9 @@
 {
   "private": true,
   "name": "forma",
-  "workspaces": [ "./packages/*" ],
+  "workspaces": ["./packages/*"],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript": "^5.8.3"
   }
 }

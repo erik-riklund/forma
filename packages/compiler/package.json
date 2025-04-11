@@ -2,5 +2,8 @@
   "type": "module",
   "name": "forma-compile",
   "version": "1.0.0",
-  "description": "A minimal template compiler with component-like isolation and slot support"
+  "description": "A minimal component-based template compiler",
+  "scripts": {
+    "dist": "bun build --minify --outdir dist source/index.ts"
+  }
 }
