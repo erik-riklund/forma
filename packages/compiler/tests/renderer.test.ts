@@ -76,6 +76,17 @@ it('should render components',
   }
 );
 
+it('should render self-closing components',
+  () =>
+  {
+    const component = '<h1>Hello {{ name }}</h1>';
+    const template = '<component test name="world" />';
+    const renderFunction = compile.toFunction(template, { test: component });
+
+    expect(renderFunction()).toBe('<h1>Hello world</h1>');
+  }
+);
+
 it('should render a list',
   () =>
   {
@@ -212,5 +223,31 @@ it('should render the else block',
     const renderFunction = compile.toFunction(template);
 
     expect(renderFunction({ test: false })).toBe('Goodbye world');
+  }
+);
+
+it('should render the correct switch case block (strings)',
+  () =>
+  {
+    const template = '<when variable="test"><case is="a">A</case>' +
+      '<case is="b">B</case><default>Default</default></when>';
+    const renderFunction = compile.toFunction(template);
+
+    expect(renderFunction({ test: 'a' })).toBe('A');
+    expect(renderFunction({ test: 'b' })).toBe('B');
+    expect(renderFunction({ test: 'c' })).toBe('Default');
+  }
+);
+
+it('should render the correct switch case block (numbers)',
+  () =>
+  {
+    const template = '<when variable="test"><case is="1">A</case>' +
+      '<case is="2">B</case><default>Default</default></when>';
+    const renderFunction = compile.toFunction(template);
+
+    expect(renderFunction({ test: 1 })).toBe('A');
+    expect(renderFunction({ test: 2 })).toBe('B');
+    expect(renderFunction({ test: 3 })).toBe('Default');
   }
 );

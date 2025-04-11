@@ -60,7 +60,7 @@ const elements: Record<string, Element> =
       const elseIf = prefix === 'else-';
       const variable = (scope === ':' ? '' : 'self.') + condition.replace('.', '?.');
 
-      return `${ !elseIf ? '${' : '\`||' }${ modifier }c(${ variable })&&\``;
+      return `${ !elseIf ? '${' : '\`||' }${ modifier }r(${ variable })&&\``;
     }
   },
 
@@ -78,6 +78,7 @@ const elements: Record<string, Element> =
     {
       const context: string[] = [];
       const properties = attributes?.matchAll(/(?<=^|\s)([a-z-]+)="([^"]+)"/gs);
+      const closed = attributes?.endsWith('/');
 
       if (properties)
       {
@@ -89,7 +90,7 @@ const elements: Record<string, Element> =
       }
 
       context.push(`__children:()=>\``);
-      return `\${__${ name }({${ context.join(',') }`;
+      return `\${__${ name }({${ context.join(',') }${ closed ? '`},self)}' : '' }`;
     }
   },
 
@@ -124,7 +125,41 @@ const elements: Record<string, Element> =
    * This allows for dynamic content rendering within specific slots.
    */
   render: { pattern: /<render\s+slot="\s*(\w+)\s*">/gs, replacement: `\${(()=>{self.__slot_$1=()=>\`` },
-  renderEnd: { pattern: /<\/render>/gs, replacement: `\`})()||''}` }
+  renderEnd: { pattern: /<\/render>/gs, replacement: `\`})()||''}` },
+
+  /**
+   * Conditional rendering block (`<when>`).
+   * This allows for conditional rendering based on variable values.
+   */
+  when:
+  {
+    pattern: /<when\s+variable="\s*(:)?\s*(\w+)\s*">/gs,
+
+    replacement: (_, ...[scope, variable]) =>
+    {
+      const prefix = scope === ':' ? '' : 'self.';
+      const path = variable.replaceAll('.', '?.');
+
+      return `\${(()=>{var a=${ prefix + path };return false||`;
+    }
+  },
+  whenEnd: { pattern: /<\/when>/gs, replacement: `'';})()}` },
+
+  /**
+   * Case block (`<case>`, `<default>`).
+   * This allows for multi-way branching based on a variable's value.
+   */
+  case:
+  {
+    pattern: /<case\s+is="\s*(\w+)\s*">/gs,
+
+    replacement: (_, ...[value]) =>
+    {
+      return `(c(a,'${ value.replaceAll(`'`, `\\'`) }')&&\``;
+    }
+  },
+  default: { pattern: /<default>/gs, replacement: `(\`` },
+  caseEnd: { pattern: /<\/(?:case|default)>/gs, replacement: `\`)||` }
 };
 
 /**
@@ -191,7 +226,8 @@ const compileTemplate = (
     `self.__slots=[${ parseSlots(template) }];` +
     `var v=(t)=>typeof t==='function'?t():t;` +
     `var e=(t)=>t.replaceAll('<','&lt;').replaceAll('>','&gt;');` +
-    `var c=(t)=>(t!==false&&t!==null&&t!==undefined);` +
+    `var r=(t)=>(t!==false&&t!==null&&t!==undefined);` +
+    `var c=(a,b)=>(typeof a==='number'?a===parseInt(b):a===b);` +
     compileDependencies(dependencies) +
     `if(self.__slots.length){self.__children&&self.__children()}` +
     `return \`${ parseElements(template) }\`;`;

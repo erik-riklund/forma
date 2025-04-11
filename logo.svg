@@ -1,0 +1,81 @@
+<svg width="256"
+     height="256"
+     xmlns="http://www.w3.org/2000/svg">
+  <!-- background -->
+  <rect x="0"
+        y="0"
+        width="256"
+        height="256"
+        rx="10"
+        fill="#202317" />
+  <!-- yellow: top -->
+  <rect x="20"
+        y="20"
+        width="100"
+        height="96"
+        fill="#E7B03A"
+        rx="5" />
+  <!-- yellow: top right corner -->
+  <rect x="115"
+        y="20"
+        width="5"
+        height="5"
+        fill="#E7B03A" />
+  <!-- yellow: bottom -->
+  <rect x="20"
+        y="110"
+        width="60"
+        height="126"
+        fill="#E7B03A"
+        rx="5" />
+  <!-- yellow: bottom right corner -->
+  <rect x="75"
+        y="231"
+        width="5"
+        height="5"
+        fill="#E7B03A" />
+  <!-- brown: top -->
+  <rect x="140"
+        y="20"
+        width="96"
+        height="96"
+        fill="#C16629"
+        rx="5" />
+  <!-- brown: top right corner -->
+  <rect x="231"
+        y="20"
+        width="5"
+        height="5"
+        fill="#C16629" />
+  <!-- brown: top left corner -->
+  <rect x="140"
+        y="20"
+        width="5"
+        height="5"
+        fill="#C16629" />
+  <!-- brown: bottom right corner -->
+  <rect x="231"
+        y="111"
+        width="5"
+        height="5"
+        fill="#C16629" />
+  <!-- beige: bottom -->
+  <rect x="100"
+        y="136"
+        width="136"
+        height="100"
+        fill="#D4BE98"
+        rx="5" />
+  <!-- beige: bottom left corner -->
+  <rect x="100"
+        y="231"
+        width="5"
+        height="5"
+        fill="#D4BE98" />
+  <!-- beige: top right corner -->
+  <rect width="5"
+        height="5"
+        x="231"
+        y="136"
+        fill="#D4BE98" />
+</svg>
