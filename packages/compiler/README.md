@@ -1,7 +1,7 @@
 ### Tiny compiler. Maximum power.
 > Please note that this project is in an early stage. Use with caution - there may be breaking changes ahead 😃
 
-**Forma Compiler** is a ~2kB declarative, component-based template compiler.  
+**Forma Compiler** is a ~2.5kB declarative, component-based template compiler.  
 It enables you to create highly efficient, secure, and maintainable server-rendered applications with ease.
 
 Forma combines a minimal footprint with a robust feature set, ensuring your applications are both **lightweight and efficient**—a crucial advantage in modern web development. Designed with a clear focus on server-side rendering, Forma avoids client-side interactivity, making it a perfect fit for scenarios where simplicity and performance are paramount. For client-side interactivity, consider pairing Forma with tools like [Alpine.js](https://alpinejs.dev/), which seamlessly complement its capabilities.
@@ -10,30 +10,30 @@ Forma combines a minimal footprint with a robust feature set, ensuring your appl
 
 ## 🔦 Highlights
 
-- 📦 **Tiny** — ~2kB minified and packed with features  
-- 🧼 **Pure** — every template compiles into an isolated render function  
-- 💡 **Declarative** — no runtime logic, no surprises  
-- ⚙️ **Composable** — build your UI with simple, nested components  
-- 🧩 **Component-oriented** — scoped props, children, slots  
-- 🔒 **Secure by design** — no `eval`, no dynamic execution inside templates  
-- 🚀 **Feature-rich** — everything you need, nothing you don’t  
+- 📦 **Tiny** — Minimal footprint but packed with features
+- 🧼 **Pure** — every template compiles into an isolated render function
+- 💡 **Declarative** — no runtime logic, no surprises
+- ⚙️ **Composable** — build your UI with simple, nested components
+- 🧩 **Component-oriented** — scoped props, block content, named slots
+- 🔒 **Secure by design** — no `eval`, no dynamic execution inside templates
+- 🚀 **Feature-rich** — everything you need, nothing you don’t
 
 ---
 
 ## ✨ Features
 
 - ✅ Pure, compiled render functions  
-- ✅ Component syntax with scoped property passing  
-- ✅ Named slots with fallback (default) content  
-- ✅ Block content via `{{@ children}}`  
-- ✅ List rendering (`<list ...>`) including reverse iteration  
-- ✅ Safe variable interpolation with fallback (`{{ user.name -> Guest }}`)  
+- ✅ Component syntax with scoped property passing and block content
+- ✅ Named slots with fallback (default) content
+- ✅ List rendering, including reversed iteration
+- ✅ Safe variable interpolation with optional default values
+- ✅ Conditional rendering of blocks
 
 ---
 
 ## 📦 Installation
 
-Coming soon on npm:  
+Coming soon on npm:
 ```bash
 npm install forma-compile
 ```
@@ -42,47 +42,121 @@ npm install forma-compile
 
 ---
 
-## 🚧 Roadmap
+## 📖 Learning the syntax
 
-- ✔️ Component system  
-- ✔️ Named slots with fallback  
-- ✔️ Block content  
-- ✔️ List rendering (including reverse mode)
-- ✔️ Default values and safe lookups
-- Self-closing component elements
-- Simple conditional rendering
-- Auto-escaped variables to avoid script injections (with a modifier to allow raw content)
-- Template syntax scan to find errors like missing end tags.
+### Variables
+
+?
+
+### Components
+
+?
+
+### Named slots
+
+?
+
+### Rendering lists
+
+?
+
+### Conditional rendering
+
+?
+
+[Explore practical examples and usage instructions](EXAMPLES.md) to get started with the Forma Compiler.
 
 ---
 
-## 🧪 Examples
+## 🚧 Roadmap
 
->This section is under construction. 🚧
+- ✔️ Components with block content
+- ✔️ Named slots with default content
+- ✔️ List rendering (including reverse mode)
+- ✔️ Variables with default values and safe lookups
+- ✔️ HTML-encoded variables to avoid script injections (with a modifier to allow raw content)
+- ✔️ Simple conditional rendering
+- 🚧 Self-closing element for components without block content
+- 🤷 Template syntax scan to catch errors like missing end tags before compilation?
+- 🤷 Extendable and customizable template syntax?
 
-### Using named slots
+---
+
+## 🧐 How it works
+
+The compiler takes your template code and transforms it into JavaScript render functions. These functions directly output the final HTML, without relying on a virtual DOM or runtime template parsing. This approach ensures minimal overhead and maximum performance, making Forma an excellent choice for server-side rendering.
+
+### A very basic template
+
+Let's assume that we have the following template:
 
 ```html
-<!-- main template -->
-<component layout>
-  <render slot="header"><h1>Welcome</h1></render>
-  <p>Hello {{ user.name -> Guest }}</p>
-</component>
+<h1>Hello world</h1>
 ```
 
-```html
-<!-- layout component -->
-<header><slot header>No title</slot></header>
-<main>{{@ children}}</main>
+After being compiled, it's transformed to this:
+
+```js
+(self, parent) => {
+  self = self || {};
+  parent = parent || {};
+  self.__slots = [];
+  var v = (t) => (typeof t === 'function' ? t() : t);
+  var e = (t) => t.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  var c = (t) => t !== false && t !== null && t !== undefined;
+  if (self.__slots.length) {
+    self.__children && self.__children();
+  }
+  return `<h1>Hello world</h1>`;
+};
 ```
 
-```ts
-import { compile } from 'forma-compiler';
+### An example using a component
 
-// we assume that `main` is the main template, and `layout` is the layout component
-const compiledFunction = compile.toFunction(main, { layout });
-const renderedHtml = compiledFunction({ user: { name: 'Forma' } });
+Let's assume that we have these templates:
+
+```js
+const component = '<h1>News</h1>{{@ children}}';
+const template = '<component test>Forma is taking shape!</component>';
+
+const renderFunction = compile.toString(template, { test: component });
 ```
+
+After being compiled, it's transformed to this:
+
+```js
+(self, parent) => {
+  self = self || {};
+  parent = parent || {};
+  self.__slots = [];
+  
+  var v = (t) => (typeof t === 'function' ? t() : t);
+  var e = (t) => t.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  var c = (t) => t !== false && t !== null && t !== undefined;
+
+  var __test = (self, parent) => {
+    self = self || {};
+    parent = parent || {};
+    self.__slots = [];
+    
+    var v = (t) => (typeof t === 'function' ? t() : t);
+    var e = (t) => t.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    var c = (t) => t !== false && t !== null && t !== undefined;
+
+    if (self.__slots.length) {
+      self.__children && self.__children();
+    }
+    return `<h1>News</h1>${v(self.__children) || ''}`;
+  };
+
+  if (self.__slots.length) {
+    self.__children && self.__children();
+  }
+  return `${__test({ __children: () => `Forma is taking shape!` }, self)}`;
+};
+```
+
+When the function is executed, the resulting output is `<h1>News</h1>Forma is taking shape!`.
 
 ---
 
