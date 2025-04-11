@@ -1,11 +1,11 @@
 import { compile } from '-';
 import { it, expect } from 'bun:test';
 
-it('should return a function when toFunction is called',
+it('should return a function',
   () => expect(compile.toFunction('')).toBeTypeOf('function')
 );
 
-it('should return a function that returns a string when toFunction is called',
+it('should return a function that returns a string',
   () =>
   {
     const template = 'Hello world';
@@ -15,23 +15,14 @@ it('should return a function that returns a string when toFunction is called',
   }
 );
 
-it('should return a string when toString is called',
-  () =>
-  {
-    const template = 'Hello world';
-    const renderString = compile.toString(template);
-
-    expect(renderString).toBeTypeOf('string');
-  }
-);
-
-it('should return a string that contains the template when toString is called',
+it('should return a string that contains the template',
   () =>
   {
     const template = compile.toString('Hello world');
     const result =
       '(self,parent)=>{self=self||{};parent=parent||{};self.__slots=[];var v=(t)=>typeof t===\'function\'?' +
-      't():t;if(self.__slots.length){self.__children&&self.__children()}return `Hello world`;}';
+      't():t;var e=(t)=>t.replaceAll(\'<\',\'&lt;\').replaceAll(\'>\',\'&gt;\');var c=(t)=>(t!==false&&t!==' +
+      'null&&t!==undefined);if(self.__slots.length){self.__children&&self.__children()}return `Hello world`;}';
 
     expect(template).toEqual(result);
   }
@@ -54,9 +45,11 @@ it('should compile dependencies correctly',
     const template = compile.toString('Hello world', dependencies);
     const result =
       '(self,parent)=>{self=self||{};parent=parent||{};self.__slots=[];var v=(t)=>typeof t===\'function\'?' +
-      't():t;var __foo=(self,parent)=>{self=self||{};parent=parent||{};self.__slots=[];var v=(t)=>typeof ' +
-      't===\'function\'?t():t;if(self.__slots.length){self.__children&&self.__children()}return `Hello`;};' +
-      'if(self.__slots.length){self.__children&&self.__children()}return `Hello world`;}';
+      't():t;var e=(t)=>t.replaceAll(\'<\',\'&lt;\').replaceAll(\'>\',\'&gt;\');var c=(t)=>(t!==false&&t!==' +
+      'null&&t!==undefined);var __foo=(self,parent)=>{self=self||{};parent=parent||{};self.__slots=[];var ' +
+      'v=(t)=>typeof t===\'function\'?t():t;var e=(t)=>t.replaceAll(\'<\',\'&lt;\').replaceAll(\'>\',\'&gt;\');' +
+      'var c=(t)=>(t!==false&&t!==null&&t!==undefined);if(self.__slots.length){self.__children&&self.__children()}' +
+      'return `Hello`;};if(self.__slots.length){self.__children&&self.__children()}return `Hello world`;}';
 
     expect(template).toEqual(result);
   }

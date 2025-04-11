@@ -45,13 +45,23 @@ it('should render context variables with functions',
   }
 );
 
-it('should render context variables with default values',
+it('should HTML encode context variables by default',
   () =>
   {
-    const template = 'Hello {{ user.name -> John }}';
+    const template = 'Hello {{ name }}';
     const renderFunction = compile.toFunction(template);
 
-    expect(renderFunction()).toBe('Hello John');
+    expect(renderFunction({ name: '<b>John</b>' })).toBe('Hello &lt;b&gt;John&lt;/b&gt;');
+  }
+);
+
+it('should not HTML encode context variables with modifier',
+  () =>
+  {
+    const template = 'Hello {{! name }}';
+    const renderFunction = compile.toFunction(template);
+
+    expect(renderFunction({ name: '<b>John</b>' })).toBe('Hello <b>John</b>');
   }
 );
 
@@ -131,5 +141,76 @@ it('should render the named slot content',
     const renderFunction = compile.toFunction(template, { layout });
 
     expect(renderFunction()).toBe('<div>Hello world</div>');
+  }
+);
+
+it('should render the named slot and the block content',
+  () =>
+  {
+    const layout = '<h1><slot title>No title available</slot></h1><p>{{@ children }}</p>';
+    const template = '<component layout><render slot="title">Hello world</render>... and then some raw text.</component>';
+    const renderFunction = compile.toFunction(template, { layout });
+
+    expect(renderFunction()).toBe('<h1>Hello world</h1><p>... and then some raw text.</p>');
+  }
+);
+
+it('should not render the conditional block',
+  () =>
+  {
+    const template = '<if condition="test">Hello world</if>';
+    const renderFunction = compile.toFunction(template);
+
+    expect(renderFunction({ test: false })).toBe('');
+  }
+);
+
+it('should render the conditional block',
+  () =>
+  {
+    const template = '<if condition="test">Hello world</if>';
+    const renderFunction = compile.toFunction(template);
+
+    expect(renderFunction({ test: true })).toBe('Hello world');
+  }
+);
+
+it('should not render the conditional block (with modifier)',
+  () =>
+  {
+    const template = '<if not condition="test">Hello world</if>';
+    const renderFunction = compile.toFunction(template);
+
+    expect(renderFunction({ test: true })).toBe('');
+  }
+);
+
+it('should render the conditional block (with modifier)',
+  () =>
+  {
+    const template = '<if not condition="test">Hello world</if>';
+    const renderFunction = compile.toFunction(template);
+
+    expect(renderFunction({ test: false })).toBe('Hello world');
+  }
+);
+
+it('should render the else-if block',
+  () =>
+  {
+    const template = '<if condition="test">Hello<else-if condition="test2">Goodbye</if>';
+    const renderFunction = compile.toFunction(template);
+
+    expect(renderFunction({ test: false, test2: true })).toBe('Goodbye');
+  }
+);
+
+it('should render the else block',
+  () =>
+  {
+    const template = '<if condition="test">Hello<else>Goodbye</if> world';
+    const renderFunction = compile.toFunction(template);
+
+    expect(renderFunction({ test: false })).toBe('Goodbye world');
   }
 );
