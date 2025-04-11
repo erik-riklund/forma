@@ -1,3 +1,5 @@
+<img src="https://github.com/erik-riklund/forma/blob/main/logo.svg" width="64" height="64">
+
 ### Tiny compiler. Maximum power.
 > Please note that this project is in an early stage. Use with caution - there may be breaking changes ahead 😃
 
