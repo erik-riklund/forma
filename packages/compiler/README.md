@@ -6,6 +6,8 @@ It enables you to create highly efficient, secure, and maintainable server-rende
 
 Forma combines a minimal footprint with a robust feature set, ensuring your applications are both **lightweight and efficient**—a crucial advantage in modern web development. Designed with a clear focus on server-side rendering, Forma avoids client-side interactivity, making it a perfect fit for scenarios where simplicity and performance are paramount. For client-side interactivity, consider pairing Forma with tools like [Alpine.js](https://alpinejs.dev/), which seamlessly complement its capabilities.
 
+[Dive right into the usage examples](EXAMPLES.md) or keep reading to find out more about what Forma Compiler is, and what it can do for your project. 😎
+
 ---
 
 ## 🔦 Highlights
@@ -22,7 +24,7 @@ Forma combines a minimal footprint with a robust feature set, ensuring your appl
 
 ## ✨ Features
 
-- ✅ Pure, compiled render functions  
+- ✅ Pure, compiled render functions
 - ✅ Component syntax with scoped property passing and block content
 - ✅ Named slots with fallback (default) content
 - ✅ List rendering, including reversed iteration
@@ -44,25 +46,126 @@ npm install forma-compile
 
 ## 📖 Learning the syntax
 
-### Variables
+Forma templates use a small set of clean, declarative syntax rules that compile into safe, fast rendering functions that output plain HTML.
 
-?
+### 🧠 Variables
 
-### Components
+Out of the box, Forma supports variable interpolation with optional default values. By default, these variables point to the provided data context.
 
-?
+```html
+Hello {{ name }}
+Hello {{ user.name -> Guest }}
+```
 
-### Named slots
+Variables are **HTML-encoded** for safety. You can disable this by using the `!` modifier:
 
-?
+```html
+{{! content }}
+```
 
-### Rendering lists
+You can use the `:` modifier to access variables from the current scope without `self`. This is especially useful inside lists or when passing properties between components.
 
-?
+You can combine `!` and `:` as long as the exclamation mark comes first.
 
-### Conditional rendering
+---
 
-?
+### 🧩 Components
+
+Components are isolated templates that receive **properties** and **block content**:
+
+```html
+<component button label="Click me"></component>
+```
+
+You can pass **dynamic values** using `{ ... }` (single braces) and the `:` modifier can be used for local variables. These variables are **never** HTML-encoded; they are provided in their raw format.
+
+```html
+<component card title="{ user.name }"></component>
+```
+
+Inside the component template, use `{{ label }}` or `{{@ children }}` to reference properties or the default slot:
+
+```html
+<!-- button component -->
+<button>{{ label }}</button>
+
+<!-- layout component -->
+<header>Header</header>
+<main>{{@ children}}</main>
+<footer>Footer</footer>
+```
+
+---
+
+### 🔌 Named slots
+
+You can define **named slot content** using `<render slot="name">` and consume it using `<slot name>` in a component:
+
+```html
+<!-- template -->
+<component layout>
+  <render slot="title">
+    <h1>My Page</h1>
+  </render>
+  <p>Welcome to Forma!</p>
+</component>
+```
+
+```html
+<!-- layout component -->
+<header>
+  <slot title>No title available</slot>
+</header>
+<main>{{@ children }}</main>
+```
+
+If a slot isn't rendered, the fallback content inside `<slot>` will be used instead.
+
+---
+
+### 🔁 Rendering lists
+
+Forma includes built-in iteration via `<list>` and `<reverse-list>`:
+
+```html
+<list users as="user">
+  <li>{{: user.name }}</li>
+</list>
+
+<reverse-list items as="item">
+  <p>{{: item }}</p>
+</reverse-list>
+```
+
+All items are automatically scoped as the variable you define (e.g. `user`, `item`).
+
+---
+
+### 🔀 Conditional rendering
+
+Forma supports inline control flow with `<if>`, `<else-if>`, and `<else>`:
+
+```html
+<if condition="loggedIn">Welcome back!</if>
+<if not condition="loggedIn">Please log in.</if>
+
+<if condition="a">
+  A is true
+<else-if condition="b">
+  B is true
+<else>
+  Neither is true...
+</if>
+```
+
+Conditions default to `self.variableName`, but you can use local scoping with `:`:
+
+```html
+<if condition=": someLocalVariable">...</if>
+```
+
+---
+### 💡 Examples
 
 [Explore practical examples and usage instructions](EXAMPLES.md) to get started with the Forma Compiler.
 
@@ -77,6 +180,9 @@ npm install forma-compile
 - ✔️ HTML-encoded variables to avoid script injections (with a modifier to allow raw content)
 - ✔️ Simple conditional rendering
 - 🚧 Self-closing element for components without block content
+
+### 🧪 Ideas
+
 - 🤷 Template syntax scan to catch errors like missing end tags before compilation?
 - 🤷 Extendable and customizable template syntax?
 
