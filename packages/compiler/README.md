@@ -1,4 +1,5 @@
 ### Tiny compiler. Maximum power.
+> Please note that this project is in an early stage. Use with caution - there may be breaking changes ahead 😃
 
 **Forma Compiler** is a ~2kB declarative, component-based template compiler.  
 It enables you to create highly efficient, secure, and maintainable server-rendered applications with ease.
