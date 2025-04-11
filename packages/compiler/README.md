@@ -1,4 +1,3 @@
-# Forma
 ### Tiny compiler. Maximum power.
 
 **Forma Compiler** is a ~2kB declarative, component-based JavaScript template compiler.  
@@ -50,6 +49,7 @@ npm install forma-compile
 - ✔️ List rendering (including reverse mode)
 - ✔️ Default values and safe lookups  
 - Simple conditional rendering
+- Auto-escaped variables to avoid script injections (with a modifier to allow raw content)
 
 ---
 
