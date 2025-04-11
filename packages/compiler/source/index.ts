@@ -140,7 +140,7 @@ const elements: Record<string, Element> =
       const prefix = scope === ':' ? '' : 'self.';
       const path = variable.replaceAll('.', '?.');
 
-      return `\${(()=>{var a=${ prefix + path };return false||`;
+      return `\${(()=>{var a=${ prefix + path };return `;
     }
   },
   whenEnd: { pattern: /<\/when>/gs, replacement: `'';})()}` },
