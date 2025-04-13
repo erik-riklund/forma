@@ -3,7 +3,7 @@
   "compilerOptions": {
     "paths": {
       "-": [ "./source/index.ts" ],
-      "-*": [ "./source/*.ts", "./source/*" ],
+      "-/*": [ "./source/*.ts", "./source/*" ],
       "types": [ "./source/index.d.ts" ]
     }
   }
