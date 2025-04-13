@@ -29,47 +29,47 @@
 
   "highlight.regexes":
   {
-    "(\\{{2})((?::|&|>)?\\s*[\\w.]+\\s*)(\\}{2})":
-    {
-      "decorations": [
-        { "color": "#ea6962" },
-        { "color": "#d4be98" },
-        { "color": "#ea6962" }
-      ],
-      "filterFileRegex": ".*\\.html$"
-    },
+    // "(\\{{2})((?::|&|>)?\\s*[\\w.]+\\s*)(\\}{2})":
+    // {
+    //   "decorations": [
+    //     { "color": "#ea6962" },
+    //     { "color": "#d4be98" },
+    //     { "color": "#ea6962" }
+    //   ],
+    //   "filterFileRegex": ".*\\.(f|ht)ml$"
+    // },
 
-    "(\\{{2})(?:(:\\s*\\w+\\s*->\\s*)([\\w\\s]+)\\s*\\s*)(\\}{2})":
-    {
-      "decorations": [
-        { "color": "#ea6962" },
-        { "color": "#d4be98" },
-        { "color": "#d3869b" },
-        { "color": "#ea6962" }
-      ],
-      "filterFileRegex": ".*\\.html$"
-    },
+    // "(\\{{2})(?:(:\\s*\\w+\\s*->\\s*)([\\w\\s]+)\\s*\\s*)(\\}{2})":
+    // {
+    //   "decorations": [
+    //     { "color": "#ea6962" },
+    //     { "color": "#d4be98" },
+    //     { "color": "#d3869b" },
+    //     { "color": "#ea6962" }
+    //   ],
+    //   "filterFileRegex": ".*\\.(f|ht)ml$"
+    // },
 
-    "(<\\/?)(layout|component)(\\s+[\\w-]+)?(>)?":
-    {
-      "decorations": [
-        { "color": "#a9b665" },
-        { "color": "#7daea3" },
-        { "color": "#d4be98" },
-        { "color": "#a9b665" }
-      ],
-      "filterFileRegex": ".*\\.html$"
-    },
+    // "(<\\/?)(component)(\\s+[\\w-]+)?(>)?":
+    // {
+    //   "decorations": [
+    //     { "color": "#a9b665" },
+    //     { "color": "#7daea3" },
+    //     { "color": "#d4be98" },
+    //     { "color": "#a9b665" }
+    //   ],
+    //   "filterFileRegex": ".*\\.(f|ht)ml$"
+    // },
 
-    "(<\\/?)(slot|placeholder)(\\s+[\\w-]+)?(>)":
-    {
-      "decorations": [
-        { "color": "#a9b665" },
-        { "color": "#d3869b" },
-        { "color": "#d8a657" },
-        { "color": "#a9b665" }
-      ],
-      "filterFileRegex": ".*\\.html$"
-    }
+    // "(<\\/?)(slot|render)(\\s+[\\w-]+)?(>)":
+    // {
+    //   "decorations": [
+    //     { "color": "#a9b665" },
+    //     { "color": "#d3869b" },
+    //     { "color": "#d8a657" },
+    //     { "color": "#a9b665" }
+    //   ],
+    //   "filterFileRegex": ".*\\.(f|ht)ml$"
+    // }
   }
 }

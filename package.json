@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": ["./packages/*"],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "npm-run-all": "4.1.5"
   }
 }
