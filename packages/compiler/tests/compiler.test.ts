@@ -17,10 +17,10 @@ it('should return a string that contains the template',
   {
     const template = compile.toString('Hello world');
     const result =
-      '(self,parent)=>{self=self||{};parent=parent||{};self.__slots=[];var v=(t)=>typeof t===' +
-      '\'function\'?t():t;var e=(t)=>t.replaceAll(\'<\',\'&lt;\').replaceAll(\'>\',\'&gt;\');' +
-      'var r=(t)=>(t!==false&&t!==null&&t!==undefined);var c=(a,b)=>(typeof a===\'number\'?a===' +
-      'parseInt(b):a===b);if(self.__slots.length){self.__children&&self.__children()}return `Hello world`;}';
+      '(self,parent)=>{self=self||{};parent=parent||{};self.__slots=[];var v=(t)=>typeof t' +
+      '===\'function\'?t():t;var e=(t)=>typeof t===\'string\'&&t.replaceAll(\'<\',\'&lt;\').' +
+      'replaceAll(\'>\',\'&gt;\')||t;var r=(t)=>t!==false&&t!==null&&t!==undefined;var c=(a,b)=>' +
+      'typeof a===\'number\'?a===parseInt(b):a===b;if(self.__children){self.__children_r=self.__children()}return `Hello world`;}';
 
     expect(template).toEqual(result);
   }

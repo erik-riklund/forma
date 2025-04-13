@@ -65,7 +65,7 @@ it('should not HTML encode context variables with modifier',
   }
 );
 
-it('should render components',
+it('should render a component with an attribute',
   () =>
   {
     const component = '<h1>Hello {{ name }}</h1>';
@@ -76,7 +76,19 @@ it('should render components',
   }
 );
 
-it('should render self-closing components',
+it('should render a component with an implicit attribute',
+  () =>
+  {
+    const component = '<list articles as="article"><h1>{{: article.title }}</h1></list>';
+    const template = '<component article ~articles></component>';
+    const renderFunction = compile.toFunction(template, { article: component });
+
+    const articles = [{ title: 'Article 1' }, { title: 'Article 2' }];
+    expect(renderFunction({ articles })).toBe('<h1>Article 1</h1><h1>Article 2</h1>');
+  }
+);
+
+it('should render a self-closing component',
   () =>
   {
     const component = '<h1>Hello {{ name }}</h1>';
@@ -84,17 +96,6 @@ it('should render self-closing components',
     const renderFunction = compile.toFunction(template, { test: component });
 
     expect(renderFunction()).toBe('<h1>Hello world</h1>');
-  }
-);
-
-it('should render a list',
-  () =>
-  {
-    const context = { users: [{ name: 'John' }, { name: 'Jane' }] };
-    const template = '<ul><list users as="user"><li>{{: user.name }}</li></list></ul>';
-    const renderFunction = compile.toFunction(template);
-
-    expect(renderFunction(context)).toBe('<ul><li>John</li><li>Jane</li></ul>');
   }
 );
 
@@ -109,11 +110,33 @@ it('should render components with block content',
   }
 );
 
+it('should render a list',
+  () =>
+  {
+    const context = { users: [{ name: 'John' }, { name: 'Jane' }] };
+    const template = '<ul><list users as="user"><li>{{: user.name }}</li></list></ul>';
+    const renderFunction = compile.toFunction(template);
+
+    expect(renderFunction(context)).toBe('<ul><li>John</li><li>Jane</li></ul>');
+  }
+);
+
+it('should render a list in reverse',
+  () =>
+  {
+    const context = { users: [{ name: 'John' }, { name: 'Jane' }] };
+    const template = '<ul><reverse-list users as="user"><li>{{: user.name }}</li></reverse-list></ul>';
+    const renderFunction = compile.toFunction(template);
+
+    expect(renderFunction(context)).toBe('<ul><li>Jane</li><li>John</li></ul>');
+  }
+);
+
 it('should render a list passed to a nested component',
   () =>
   {
-    const userList = '<ul><list users as="user"><li>{{: user.name }}</li></list></ul>';
     const template = '<component userList users="{ users }"></component>';
+    const userList = '<ul><list users as="user"><li>{{: user.name }}</li></list></ul>';
     const renderFunction = compile.toFunction(template, { userList });
 
     const context = { users: [{ name: 'John' }, { name: 'Jane' }] };

@@ -1,18 +1,9 @@
 {
   "type": "module",
   "name": "forma-compile",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "A declarative, component-based template compiler for server-rendered HTML.",
-  "keywords": [
-    "forma",
-    "template",
-    "ssr",
-    "html",
-    "compiler",
-    "minimal",
-    "component",
-    "slot"
-  ],
+  "keywords": [ "forma", "template", "ssr", "html", "compiler", "minimal", "component", "slot" ],
   "author": "Erik Riklund (Gopher)",
   "license": "MIT",
   "main": "dist/index.js",
@@ -25,13 +16,9 @@
     }
   },
   "files": [ "dist" ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/erik-riklund/forma"
-  },
-  "bugs": {
-    "url": "https://github.com/erik-riklund/forma/issues"
-  },
+  "sideEffects": false,
+  "repository": { "type": "git", "url": "https://github.com/erik-riklund/forma" },
+  "bugs": { "url": "https://github.com/erik-riklund/forma/issues" },
   "homepage": "https://github.com/erik-riklund/forma/tree/main/packages/compiler",
   "scripts": {
     "dist": "bun build --minify --outdir dist source/index.ts",

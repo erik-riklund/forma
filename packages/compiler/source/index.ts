@@ -15,7 +15,7 @@ const elements: Record<string, Element> =
   /**
    * Handles block content insertion (`{{@ children }}`)
    */
-  children: { pattern: /\{\{\s*@\s*children\s*\}\}/gs, replacement: `\${v(self.__children)||''}` },
+  children: { pattern: /\{\{\s*@\s*children\s*\}\}/gs, replacement: `\${v(self.__children_r)||''}` },
 
   /**
    * Handles variable interpolation and fallback values,
@@ -23,7 +23,7 @@ const elements: Record<string, Element> =
    */
   variable:
   {
-    pattern: /(\{\{?)\s*(!{0,1}:{0,1})?\s*(\w+(?:\.\w+)*)\s*(?:->\s*([^\}]+)\s*)?\}\}?/gs,
+    pattern: /(\{\{?)\s*(!?:?)?\s*(\w+(?:\.\w+)*)\s*(?:->\s*([^\}]+)\s*)?\}?\}/gs,
 
     replacement: (_, ...[braces, scope, name, value]) =>
     {
@@ -77,7 +77,7 @@ const elements: Record<string, Element> =
     replacement: (_, ...[name, attributes]) =>
     {
       const context: string[] = [];
-      const properties = attributes?.matchAll(/(?<=^|\s)([a-z-]+)="([^"]+)"/gs);
+      const properties = attributes?.matchAll(/(?<=^|\s)(?:(~?\w+)(?:="([^"]+)")?)/gs);
       const closed = attributes?.endsWith('/');
 
       if (properties)
@@ -85,7 +85,13 @@ const elements: Record<string, Element> =
         for (const property of properties)
         {
           const [name, value] = property.slice(1, 3);
-          context.push(`${ name }:${ value.startsWith('v(') ? value : `'${ value }'` }`);
+          const key = name.startsWith('~') ? name.slice(1) : name;
+
+          const variable = value ?
+            (/^v\(\w+(?:\??\.\w+)*\)$/s.test(value) ? value : `'${ value }'`) :
+            `(typeof ${ key }!=='undefined'&&v(${ key }))||v(self.${ key.replaceAll('.', '?.') })||undefined`;
+
+          context.push(`${ key }:${ variable }`);
         }
       }
 
@@ -225,11 +231,11 @@ const compileTemplate = (
     `self=self||{};parent=parent||{};` +
     `self.__slots=[${ parseSlots(template) }];` +
     `var v=(t)=>typeof t==='function'?t():t;` +
-    `var e=(t)=>t.replaceAll('<','&lt;').replaceAll('>','&gt;');` +
-    `var r=(t)=>(t!==false&&t!==null&&t!==undefined);` +
-    `var c=(a,b)=>(typeof a==='number'?a===parseInt(b):a===b);` +
+    `var e=(t)=>typeof t==='string'&&t.replaceAll('<','&lt;').replaceAll('>','&gt;')||t;` +
+    `var r=(t)=>t!==false&&t!==null&&t!==undefined;` +
+    `var c=(a,b)=>typeof a==='number'?a===parseInt(b):a===b;` +
     compileDependencies(dependencies) +
-    `if(self.__slots.length){self.__children&&self.__children()}` +
+    `if(self.__children){self.__children_r=self.__children()}` +
     `return \`${ parseElements(template) }\`;`;
 
   return body;
