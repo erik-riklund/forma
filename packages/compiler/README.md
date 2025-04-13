@@ -3,7 +3,7 @@
 # Forma Compile
 
 ![Version](https://img.shields.io/npm/v/forma-compile?style=flat-square)
-![Bundle size](https://img.shields.io/badge/bundle-~3.27kB-green?style=flat-square&labelColor=222&color=44cc88)
+![Bundle size](https://img.shields.io/badge/bundle-~3.28kB-green?style=flat-square&labelColor=222&color=44cc88)
 ![License](https://img.shields.io/npm/l/forma-compile?style=flat-square)
 
 ### Tiny compiler. Maximum power. ⚡
