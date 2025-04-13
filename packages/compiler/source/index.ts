@@ -15,7 +15,11 @@ const elements: Record<string, Element> =
   /**
    * Handles block content insertion (`{{@ children }}`)
    */
-  children: { pattern: /\{\{\s*@\s*children\s*\}\}/gs, replacement: `\${v(self.__children_r)||''}` },
+  children:
+  {
+    pattern: /\{\{\s*@\s*children\s*\}\}/gs,
+    replacement: `\${v(self.__children_r)||''}`
+  },
 
   /**
    * Handles variable interpolation and fallback values,
@@ -183,9 +187,9 @@ const parseElements = (template: Template): Template =>
     (element) =>
     {
       const { pattern, replacement } = element;
-      template = template.replaceAll(pattern,
-        replacement as (...args: string[]) => string
-      );
+
+      // @ts-ignore - the custom type isn't accepted by the compiler.
+      template = template.replaceAll(pattern, replacement);
     }
   );
   return template;
