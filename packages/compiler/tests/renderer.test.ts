@@ -110,6 +110,35 @@ it('should render components with block content',
   }
 );
 
+it('should render a component recursively',
+  () =>
+  {
+    const createNodes = (
+      labelPrefix: string, depth = 3, breadth = 3, level = 1): any[] =>
+    {
+      if (depth === 0) return [];
+
+      return Array.from({ length: breadth }, (_, i) =>
+      {
+        const label = `${ labelPrefix }.${ i + 1 }`;
+        return {
+          label: `Node ${ label }`,
+          children: createNodes(label, depth - 1, breadth, level + 1)
+        };
+      });
+    };
+
+    const node = '<h3>{{ label }}</h3><ul><li><list children as="child">' +
+      '<component self label="{:child.label}" children="{:child.children}" /></list></li></ul>';
+
+    const renderFunction = compile.toFunction(node, undefined, { recursive: true });
+    const result = renderFunction({ label: 'Node 1', children: createNodes('1', 2, 3) });
+
+    expect(result).toContain('<h3>Node 1</h3>');
+    expect(result).toContain('<h3>Node 1.3.3</h3>');
+  }
+);
+
 it('should render a list',
   () =>
   {
