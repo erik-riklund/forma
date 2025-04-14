@@ -8,8 +8,6 @@
 
 ### Tiny compiler. Maximum power. ⚡
 
-> *“I just needed something simple...”* → ends up building a lightning-fast compiler with components, slots, scoped logic, list rendering, and secure defaults, all under 3.5kB.
-
 The **Forma compiler** is a declarative, component-based template compiler designed to streamline server-side rendering. With its clean and minimal syntax, Forma transforms templates into secure and isolated render functions, enabling the creation of fast, lightweight, and scalable web applications.
 
 > While the compiler is primarily designed for web development, its versatility allows it to be adapted for other use cases as well.
