@@ -12,6 +12,17 @@ export interface Element
 }
 
 /**
+ * Optional configuration settings for the compiler.
+ */
+export interface Options
+{
+  /**
+   * Specifies whether a component is able to call itself recursively.
+   */
+  recursive?: boolean;
+}
+
+/**
  * A generic template context object passed to render functions.
  * Typically holds all the data used during rendering (e.g., variables, props).
  */

@@ -1,6 +1,7 @@
 import type {
   Dependencies,
   Element,
+  Options,
   RenderFunction,
   Template
 } from 'types';
@@ -143,14 +144,14 @@ const elements: Record<string, Element> =
    */
   when:
   {
-    pattern: /<when\s+variable="\s*(:)?\s*(\w+)\s*">/gs,
+    pattern: /<when\s+variable="\s*(:)?\s*(\w+(?:\.\w+)*)\s*">/gs,
 
     replacement: (_, ...[scope, variable]) =>
     {
       const prefix = scope === ':' ? '' : 'self.';
       const path = variable.replaceAll('.', '?.');
 
-      return `\${(()=>{var a=${ prefix + path };return `;
+      return `\${(()=>{const a=${ prefix + path };return `;
     }
   },
   whenEnd: { pattern: /<\/when>/gs, replacement: `'';})()}` },
@@ -204,7 +205,7 @@ const parseElements = (template: Template): Template =>
 const compileDependencies = (dependencies: Dependencies): string =>
 {
   const result = Object.entries(dependencies).map(
-    ([name, template]) => `var __${ name }=${ compile.toString(template) };`, ''
+    ([name, template]) => `const __${ name }=${ compile.toString(template) };`, ''
   );
   return result.join('');
 };
@@ -234,10 +235,10 @@ const compileTemplate = (
   let body =
     `self=self||{};parent=parent||{};` +
     `self.__slots=[${ parseSlots(template) }];` +
-    `var v=(t)=>typeof t==='function'?t():t;` +
-    `var e=(t)=>typeof t==='string'&&t.replaceAll('<','&lt;').replaceAll('>','&gt;')||t;` +
-    `var r=(t)=>t!==false&&t!==null&&t!==undefined;` +
-    `var c=(a,b)=>typeof a==='number'?a===parseInt(b):a===b;` +
+    `const v=(t)=>typeof t==='function'?t():t;` +
+    `const e=(t)=>typeof t==='string'&&t.replaceAll('<','&lt;').replaceAll('>','&gt;')||t;` +
+    `const r=(t)=>t!==false&&t!==null&&t!==undefined;` +
+    `const c=(a,b)=>typeof a==='number'?a===parseInt(b):a===b;` +
     compileDependencies(dependencies) +
     `if(self.__children){self.__children_r=self.__children()}` +
     `return \`${ parseElements(template) }\`;`;
@@ -256,12 +257,20 @@ export const compile =
    * 
    * @param template - The template string to be compiled.
    * @param dependencies - An object containing dependencies to be compiled.
+   * @param options - Optional settings for the compilation process.
    * @return A render function that can be used to render the template.
    */
-  toFunction: (template: Template, dependencies: Dependencies = {}): RenderFunction =>
+  toFunction: (
+    template: Template, dependencies: Dependencies = {},
+    { recursive }: Options = {}): RenderFunction =>
   {
     try
     {
+      if (recursive === true)
+      {
+        dependencies.self = template;
+      }
+      
       const body = compileTemplate(template, dependencies);
       return new Function('self', 'parent', body) as RenderFunction;
     }
@@ -269,6 +278,7 @@ export const compile =
     catch (error)
     {
       console.error(error);
+
       return new Function('self', 'parent', `return \`${ error }\`;`) as RenderFunction;
     }
   },
@@ -278,10 +288,18 @@ export const compile =
    * 
    * @param template - The template string to be compiled.
    * @param dependencies - An object containing dependencies to be compiled.
+   * @param options - Optional settings for the compilation process.
    * @return A string representation of the render function.
    */
-  toString: (template: Template, dependencies: Dependencies = {}): string =>
+  toString: (
+    template: Template, dependencies: Dependencies = {},
+    { recursive }: Options = {}): string =>
   {
+    if (recursive === true)
+    {
+      dependencies.self = template;
+    }
+
     return `(self,parent)=>{${ compileTemplate(template, dependencies) }}`;
   }
 };
