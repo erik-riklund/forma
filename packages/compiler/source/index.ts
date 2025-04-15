@@ -118,7 +118,7 @@ const elements: Record<string, Element> =
     replacement: (_, ...[prefix, source, variable]) =>
     {
       const reverse = prefix === 'reverse-' ? '.reverse()' : '';
-      return `\${(v(self.${ source })||[])${ reverse }.map(${ variable }=>\``;
+      return `\${(v(self.${ source })||null)?${ reverse }.map(${ variable }=>\``;
     }
   },
 
@@ -205,7 +205,19 @@ const parseElements = (template: Template): Template =>
 const compileDependencies = (dependencies: Dependencies): string =>
 {
   const result = Object.entries(dependencies).map(
-    ([name, template]) => `const __${ name }=${ compile.toString(template) };`, ''
+    ([name, template]) => 
+    {
+      if (typeof template !== 'string')
+      {
+        throw new Error(
+          `Invalid template type for dependency (${ name }). Expected a raw or precompiled string.`
+        );
+      }
+
+      return template.startsWith('(self,parent)=>{')
+        ? `const __${ name }=${ template };` // precompiled template.
+        : `const __${ name }=${ compile.toString(template) };`;
+    }
   );
   return result.join('');
 };
@@ -264,23 +276,13 @@ export const compile =
     template: Template, dependencies: Dependencies = {},
     { recursive }: Options = {}): RenderFunction =>
   {
-    try
+    if (recursive === true)
     {
-      if (recursive === true)
-      {
-        dependencies.self = template;
-      }
-      
-      const body = compileTemplate(template, dependencies);
-      return new Function('self', 'parent', body) as RenderFunction;
+      dependencies.self = template;
     }
 
-    catch (error)
-    {
-      console.error(error);
-
-      return new Function('self', 'parent', `return \`${ error }\`;`) as RenderFunction;
-    }
+    const body = compileTemplate(template, dependencies);
+    return new Function('self', 'parent', body) as RenderFunction;
   },
 
   /**

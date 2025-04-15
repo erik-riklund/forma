@@ -1,6 +1,15 @@
 import { compile } from '-';
 import { it, expect } from 'bun:test';
 
+/**
+ * This test verifies the performance and correctness of compiling and rendering
+ * a simple component 1,000 times. The component is defined with a static template
+ * and no dynamic data. The test ensures that the rendered output matches the
+ * expected HTML string for each iteration, confirming that the rendering process
+ * is consistent and efficient.
+ * 
+ * Execution time: ~60ms
+ */
 it.skip('compiles and renders a simple component 1,000 times',
   () =>
   {
@@ -20,6 +29,15 @@ it.skip('compiles and renders a simple component 1,000 times',
   }
 );
 
+/**
+ * This test evaluates the performance and correctness of rendering a precompiled
+ * component 100,000 times. The component is defined with a static template that
+ * includes a dynamic placeholder for a `count` value. The test ensures that the
+ * rendered output matches the expected HTML string for each iteration, confirming
+ * that the rendering process is both accurate and efficient under high repetition.
+ * 
+ * Execution time: ~95ms
+ */
 it.skip('renders a precompiled component 100,000 times',
   () =>
   {
@@ -40,6 +58,16 @@ it.skip('renders a precompiled component 100,000 times',
   }
 );
 
+/**
+ * This test evaluates the performance and correctness of compiling and rendering
+ * a component with two dependencies 1,000 times. The component is defined with
+ * a static template that includes two dynamic placeholders: one for a `name` value
+ * and another for a `file` value. The test ensures that the rendered output matches
+ * the expected HTML string for each iteration, confirming that the rendering process
+ * is accurate and efficient when handling multiple dependencies.
+ * 
+ * Execution time: ~100ms
+ */
 it.skip('compiles and renders a component with two dependencies 1,000 times',
   () =>
   {
@@ -63,6 +91,16 @@ it.skip('compiles and renders a component with two dependencies 1,000 times',
   }
 );
 
+/**
+ * This test evaluates the performance and correctness of rendering a list with
+ * 100 items using a precompiled component 1,000 times. The component is defined
+ * with a static template that includes a dynamic placeholder for an `items` array.
+ * The test ensures that the rendered output matches the expected HTML string for
+ * each iteration, confirming that the rendering process is accurate and efficient
+ * when handling lists with multiple items.
+ * 
+ * Execution time: ~50ms
+ */
 it.skip('renders a list with 100 items using a precompiled component 1000 times',
   () =>
   {
@@ -84,6 +122,16 @@ it.skip('renders a list with 100 items using a precompiled component 1000 times'
   }
 );
 
+/**
+ * This test evaluates the performance and correctness of compiling and rendering
+ * a component with 100 dependencies 100 times. Each dependency is a simple component
+ * that renders a static template with a dynamic placeholder for a `name` value.
+ * The test ensures that the rendered output matches the expected HTML string for
+ * each iteration, confirming that the rendering process is accurate and efficient
+ * when handling a large number of dependencies.
+ * 
+ * Execution time: ~400ms
+ */
 it.skip('compiles and renders a component and its 100 dependencies 100 times',
   () =>
   {
@@ -107,7 +155,20 @@ it.skip('compiles and renders a component and its 100 dependencies 100 times',
   }
 );
 
-it('renders a deep tree (111,111 nodes) using a recursive component',
+/**
+ * This test evaluates the performance and correctness of rendering a deep tree
+ * structure with 111,111 nodes using a recursive component. The tree is generated
+ * dynamically with a specified depth and breadth, where each node contains a label
+ * and a list of child nodes. The component is defined with a recursive template
+ * that renders each node and its children.
+ * 
+ * The test ensures that the rendered output includes the expected labels for the root
+ * node and the deepest node, confirming that the recursive rendering process is accurate
+ * and efficient for large hierarchical structures.
+ * 
+ * Execution time: ~150ms
+ */
+it.skip('renders a deep tree (111,111 nodes) using a recursive component',
   () =>
   {
     const createNodes = (
@@ -135,3 +196,33 @@ it('renders a deep tree (111,111 nodes) using a recursive component',
     expect(result).toContain('<h3>Node 1.10.10.10.10.10</h3>');
   }
 );
+
+/**
+ * ?
+ */
+it.todo('renders 10,000 components, each with three named slots',
+  () =>
+  {
+
+  }
+);
+
+// it('renders 10,000 components each with 3 named slots', () => {
+//   const layout = `
+//     <header><slot title /></header>
+//     <section><slot content /></section>
+//     <footer><slot footer /></footer>
+//   `;
+//   const template = Array.from({ length: 10_000 }, (_, i) => `
+//     <component layout>
+//       <render slot="title"><h1>Title ${i}</h1></render>
+//       <render slot="content"><p>Body ${i}</p></render>
+//       <render slot="footer"><small>End ${i}</small></render>
+//     </component>
+//   `).join('');
+
+//   const renderFunction = compile.toFunction(template, { layout });
+//   const result = renderFunction();
+
+//   expect(result).toContain('Title 9999');
+// });

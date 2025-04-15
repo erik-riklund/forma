@@ -3,18 +3,18 @@
 # Forma Compile
 
 ![Version](https://img.shields.io/npm/v/forma-compile?style=flat-square)
-![Bundle size](https://img.shields.io/badge/bundle-~3.28kB-green?style=flat-square&labelColor=222&color=44cc88)
+![Bundle size](https://img.shields.io/badge/bundle-~3.5kB-green?style=flat-square&labelColor=222&color=44cc88)
 ![License](https://img.shields.io/npm/l/forma-compile?style=flat-square)
 
 ### Tiny compiler. Maximum power. ⚡
 
-Looking for an alternative to JSX, Handlebars, or EJS that is declarative, fast, and composable? Forma is built for you.
+Looking for an alternative to JSX, Handlebars, or EJS that is **declarative**, **fast**, and **composable**? Forma is built for you.
 
 ---
 
 ## 🔦 Highlights
 
-- 📦 **Tiny** — `3.28kB` runtime with no dependencies
+- 📦 **Tiny** — `~3.5kB` runtime with no dependencies
 - 🔒 **Secure by design** — no runtime code evaluation
 - 🧠 **Optimized** — carefully designed to maximize utility without redundancy
 - 🧼 **Isolated** — templates compile into self-contained render functions
@@ -32,7 +32,7 @@ The compiler delivers a robust feature set with a minimal footprint, making it a
 
 ### 🔧 Versatile by design
 
-While Forma is primarily designed with server-focused web development in mind, its versatility allows it to be adapted for other use cases as well. These include:
+Forma is fast, expressive, and designed with server-first rendering in mind — but its simplicity makes it just as powerful in tooling and automation. Whether you're building websites, PDFs, emails, or CLI utilities, Forma keeps your output clean, fast, and safe by default.
 
 - **Static site generation** 📄<br>
   Forma can be used to pre-render static HTML pages for blogs, documentation sites, or marketing pages, ensuring fast load times and SEO optimization.
@@ -43,24 +43,22 @@ While Forma is primarily designed with server-focused web development in mind, i
 - **Command-line tools** 💻<br>
   Forma's lightweight nature makes it suitable for building CLI tools that generate HTML or other text-based outputs.
 
-By extending its use beyond traditional web development, Forma serves as a lightweight and powerful tool across a wide range of applications that require efficient and secure template rendering.
-
 ---
 
 ## ⚡ Performance
 
-*Performance tests will be added continuously to test the limits.*
+*Performance tests will be added continuously to test resilience, speed, and scalability.*
 
 - ✅ Compiled and rendered a simple component **1,000** times in ~**60ms**
+- ✅ Rendered a precompiled component **100,000** times in ~**95ms**
 - ✅ Compiled **1,003** components and executed **3,001** total renders in ~**100ms**
-- ✅ Rendered a precompiled component **100,000** times in ~**90ms**
 - ✅ Rendered a list with **100 items** using a precompiled component **1,000** times in ~**50ms**
 - ✅ Compiled and rendered a component with **100 dependencies**, **100** times in ~**400ms**
 - ✅ Rendered a deeply nested recursive component tree with **111,111 nodes** in ~**150ms**
 
 Forma isn’t just fast under pressure — **it’s composed.** 🥁
 
-> All tests were conducted using the [Bun](https://bun.sh/) runtime.
+> ℹ️ All tests were conducted using the [Bun](https://bun.sh/) runtime.
 
 ---
 ## 📦 Installation
@@ -85,7 +83,7 @@ The `compile` API provides two key methods: `toFunction` and `toString`.
 
 ### `toFunction`
 
-This method compiles a template into a reusable render function:
+This method compiles a template into an executable render function:
 
 ```js
 const template = 'Hello {{ name }}!';
@@ -98,7 +96,7 @@ console.log(output); // Output: Hello World!
 
 ### `toString`
 
-This method compiles a template into a string representation of the render function, which can be cached or reused:
+Returns a stringified render function that can be evaluated or reused later, such as in build pipelines or caching layers:
 
 ```js
 const template = 'Hello {{ name }}!';
@@ -111,21 +109,26 @@ console.log(compiledFunction); // Output: A string representation of the render 
 
 Both methods share the same parameters:
 
-- **`template: Template`**: The template string to be compiled.
-- **`dependencies: Dependencies = {}`**: An optional object containing components that the template rely on.
-- **`{ recursive }: Options = {}`**: An optional configuration object. The `recursive` flag determines whether the compiler should enable the component to call itself.
+- **`template: Template`**<br>
+  The template string to be compiled.
+- **`dependencies: Dependencies = {}`**<br>
+  An optional object containing templates that the template relies on.
+- **`{ recursive: boolean }: Options = {}`**<br>
+  An optional configuration object. The `recursive` flag determines whether the compiler should enable the component to call itself.
 
 
 ### When to use each method
 
-- **`toFunction`**: Use this for immediate execution of templates with a data context.
-- **`toString`**: Use this for scenarios where you need to store or transmit the compiled function, such as caching or server-side precompilation.
+- **`toFunction`**<br>
+  Use this for immediate execution of templates with a data context.
+- **`toString`**<br>
+  Use this for scenarios where you need to store or transmit the compiled function, such as caching or server-side precompilation.
 
 ---
 
 ## 📖 Learning the syntax
 
-Forma templates use a concise, declarative syntax designed for simplicity and developer experience. The syntax is intentionally minimalistic, allowing you to focus on the structure and logic of your templates without unnecessary complexity.
+Forma templates use a concise, declarative syntax designed for simplicity, readability and developer experience. The syntax is intentionally minimalistic, allowing you to focus on the structure of your templates without unnecessary complexity.
 
 ### Key syntax features
 
@@ -180,7 +183,7 @@ Compiles to `content` (a local variable)
 {{!: content }}
 ```
 
-> *You can combine `!` and `:` as long as the exclamation mark comes first.*
+> ℹ️ *You can combine `!` and `:` as long as the exclamation mark comes first.*
 
 ---
 
@@ -263,7 +266,7 @@ You can define **named slot content** using `<render slot="name">` and consume i
 <main>{{@ children }}</main>
 ```
 
-> If a slot isn't rendered, the fallback content inside `<slot>` will be used instead.
+> ℹ️ If a slot isn't rendered, the fallback content inside `<slot>` will be used instead. 
 
 ---
 
@@ -326,6 +329,51 @@ By default, the specified variable points to `self.variableName`, which is the p
 
 ---
 
+### 🔄 Recursive components
+
+Forma supports recursive components, allowing a component to call itself during rendering. This is particularly useful for scenarios like rendering nested menus, trees, or other hierarchical structures.
+
+> ⚠️ Recursive components should be used with caution to avoid infinite loops or excessive nesting that could impact performance.
+
+```html
+<h1>{{ title }}</h1>
+<ul>
+  <list items as="item">
+    <li>
+      <component self title="{: item.title }" items="{: item.items }" />
+    </li>
+  </list>
+</ul>
+```
+
+To enable recursion, set the `recursive` flag to `true` when compiling the component:
+
+```js
+// we assume that `folder` contains the template above!
+const renderFunction = compile.toFunction(folder, {}, { recursive: true });
+
+const result = renderFunction(
+  {
+    title: 'Top dawg',
+    items: [
+      { title: 'Underdog', items: [ /* ... */ ] },
+      // imagine more items here...
+    ]
+  }
+);
+```
+
+#### Recursive dependencies
+
+To enable recursiveness in dependency components, they must be precompiled with the `recursive` flag set to `true`:
+
+```js
+const nodeComponent = compile.toString(nodeTemplate, {}, { recursive: true });
+const treeComponent = compile.toFunction(treeTemplate, { node: nodeComponent });
+```
+
+---
+
 ## 💡 Examples
 
 [Explore practical examples and usage instructions](https://github.com/erik-riklund/forma/blob/main/packages/compiler/docs/EXAMPLES.md) to get started.
@@ -372,9 +420,7 @@ The helper functions (`v`, `e`, `r`, and `c`) are injected into every compiled t
 - `r`: evaluates truthiness
 - `c`: compares switch values
 
-They are always present, even when not used, as each template is self-contained.
-
-> When the cache handler is introduced into the Forma suite, it will employ optimizations that remove unused helpers and components. The compiler doesn't care. 😄
+They are always present, even when not used, as each template is self-contained. They are harmless and will not add a significant overhead to the rendering process.
 
 ---
 
