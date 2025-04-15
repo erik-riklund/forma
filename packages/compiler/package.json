@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "forma-compile",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A declarative, component-based template compiler for server-rendered HTML.",
   "keywords": [ "forma", "template", "ssr", "html", "compiler", "minimal", "component", "slot" ],
   "author": "Erik Riklund (Gopher)",
