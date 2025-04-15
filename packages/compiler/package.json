@@ -21,7 +21,7 @@
   "bugs": { "url": "https://github.com/erik-riklund/forma/issues" },
   "homepage": "https://github.com/erik-riklund/forma/tree/main/packages/compiler",
   "scripts": {
-    "dist": "bun build --minify --outdir dist source/index.ts",
+    "build": "bun build --minify --outdir dist --target node source/index.ts",
     "test": "bun test --watch"
   }
 }

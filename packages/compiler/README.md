@@ -3,32 +3,62 @@
 # Forma Compile
 
 ![Version](https://img.shields.io/npm/v/forma-compile?style=flat-square)
-![Bundle size](https://img.shields.io/badge/bundle-~3.28kB-green?style=flat-square&labelColor=222&color=44cc88)
+![Bundle size](https://img.shields.io/badge/bundle-~3.5kB-green?style=flat-square&labelColor=222&color=44cc88)
 ![License](https://img.shields.io/npm/l/forma-compile?style=flat-square)
 
 ### Tiny compiler. Maximum power. ⚡
 
-The **Forma compiler** is a declarative, component-based template compiler designed to streamline server-side rendering. With its clean and minimal syntax, Forma transforms templates into secure and isolated render functions, enabling the creation of fast, lightweight, and scalable web applications.
-
-> While the compiler is primarily designed for web development, its versatility allows it to be adapted for other use cases as well.
-
-The compiler delivers a robust feature set with a minimal footprint, making it an excellent fit for modern server-rendered web development. Its focus on server-side rendering ensures simplicity and performance, making it ideal for scenarios where client-side interactivity isn’t required.
-
-> Use complementary tools like [Alpine.js](https://alpinejs.dev/) for client-side interactivity.
-
-[Explore usage examples](https://github.com/erik-riklund/forma/blob/main/packages/compiler/docs/EXAMPLES.md) or continue reading to learn more about how Forma can enhance your project. 🚀
+Looking for an alternative to JSX, Handlebars, or EJS that is **declarative**, **fast**, and **composable**? Forma is built for you.
 
 ---
 
 ## 🔦 Highlights
 
-- 📦 **Tiny** — `3.28kB` runtime with no dependencies
+- 📦 **Tiny** — `~3.5kB` runtime with no dependencies
 - 🔒 **Secure by design** — no runtime code evaluation
 - 🧠 **Optimized** — carefully designed to maximize utility without redundancy
 - 🧼 **Isolated** — templates compile into self-contained render functions
 - 💡 **Predictable** — declarative templates with no runtime surprises
 - 🧩 **Component-driven** — scoped properties, block content, and named slots
 - ⚙️ **Composable** — build UIs by combining reusable components
+
+---
+
+**Forma** is a declarative, component-based template compiler designed to streamline server-side rendering. With its clean and minimal syntax, Forma transforms templates into secure, self-contained render functions, enabling the creation of fast, lightweight, and scalable applications.
+
+The compiler delivers a robust feature set with a minimal footprint, making it an excellent fit for modern server-rendered web development. Its focus on server-side rendering ensures simplicity and performance, making it ideal for scenarios where client-side interactivity isn’t required.
+
+> Use complementary tools like [Alpine.js](https://alpinejs.dev/) to layer in lightweight, declarative interactivity while Forma handles secure, server-rendered HTML. This pairing enhances your UI where needed, without adding runtime complexity or compromising security.
+
+### 🔧 Versatile by design
+
+Forma is fast, expressive, and designed with server-first rendering in mind — but its simplicity makes it just as powerful in tooling and automation. Whether you're building websites, PDFs, emails, or CLI utilities, Forma keeps your output clean, fast, and safe by default.
+
+- **Static site generation** 📄<br>
+  Forma can be used to pre-render static HTML pages for blogs, documentation sites, or marketing pages, ensuring fast load times and SEO optimization.
+- **PDF generation** 📑<br>
+  Combine Forma with libraries like [Puppeteer](https://pptr.dev/) to create dynamic, server-rendered PDFs for invoices, reports, or other documents.
+- **Email template rendering** 📧<br>
+  Its secure and predictable syntax makes it a great choice for generating dynamic email templates with personalized content.
+- **Command-line tools** 💻<br>
+  Forma's lightweight nature makes it suitable for building CLI tools that generate HTML or other text-based outputs.
+
+---
+
+## ⚡ Performance
+
+*Performance tests will be added continuously to test resilience, speed, and scalability.*
+
+- ✅ Compiled and rendered a simple component **1,000** times in ~**60ms**
+- ✅ Rendered a precompiled component **100,000** times in ~**95ms**
+- ✅ Compiled **1,003** components and executed **3,001** total renders in ~**100ms**
+- ✅ Rendered a list with **100 items** using a precompiled component **1,000** times in ~**50ms**
+- ✅ Compiled and rendered a component with **100 dependencies**, **100** times in ~**400ms**
+- ✅ Rendered a deeply nested recursive component tree with **111,111 nodes** in ~**150ms**
+
+Forma isn’t just fast under pressure — **it’s composed.** 🥁
+
+> ℹ️ All tests were conducted using the [Bun](https://bun.sh/) runtime.
 
 ---
 ## 📦 Installation
@@ -39,11 +69,9 @@ To install Forma Compile, use your preferred `npm`-compatible package manager:
 npm install forma-compile
 ```
 
-> The manager preferred by Forma is [Bun](https://bun.sh/).
-
 ---
 
-## ⚙️ Using the Compiler
+## ⚙️ Using the compiler
 
 After installing Forma Compile, you can start using its compiler by importing it into your project:
 
@@ -55,7 +83,7 @@ The `compile` API provides two key methods: `toFunction` and `toString`.
 
 ### `toFunction`
 
-This method compiles a template into a reusable render function:
+This method compiles a template into an executable render function:
 
 ```js
 const template = 'Hello {{ name }}!';
@@ -68,28 +96,41 @@ console.log(output); // Output: Hello World!
 
 ### `toString`
 
-This method compiles a template into a string representation of the render function, which can be cached or reused:
+Returns a stringified render function that can be evaluated or reused later, such as in build pipelines or caching layers:
 
 ```js
 const template = 'Hello {{ name }}!';
 const compiledFunction = compile.toString(template);
 
-console.log(compiledFunction);
-// Output: A string representation of the render function
+console.log(compiledFunction); // Output: A string representation of the render function
 ```
+
+### Parameters
+
+Both methods share the same parameters:
+
+- **`template: Template`**<br>
+  The template string to be compiled.
+- **`dependencies: Dependencies = {}`**<br>
+  An optional object containing templates that the template relies on.
+- **`{ recursive: boolean }: Options = {}`**<br>
+  An optional configuration object. The `recursive` flag determines whether the compiler should enable the component to call itself.
+
 
 ### When to use each method
 
-- **`toFunction`**: Use this for immediate execution of templates with a data context.
-- **`toString`**: Use this for scenarios where you need to store or transmit the compiled function, such as caching or server-side precompilation.
+- **`toFunction`**<br>
+  Use this for immediate execution of templates with a data context.
+- **`toString`**<br>
+  Use this for scenarios where you need to store or transmit the compiled function, such as caching or server-side precompilation.
 
 ---
 
 ## 📖 Learning the syntax
 
-Forma templates use a concise, declarative syntax designed for simplicity and developer experience. The syntax is intentionally minimalistic, allowing you to focus on the structure and logic of your templates without unnecessary complexity.
+Forma templates use a concise, declarative syntax designed for simplicity, readability and developer experience. The syntax is intentionally minimalistic, allowing you to focus on the structure of your templates without unnecessary complexity.
 
-### Key Syntax Features
+### Key syntax features
 
 1. **Declarative** — Forma templates emphasize a declarative approach, where you describe what the UI should look like rather than how to construct it. This makes the templates easier to read and maintain.
 
@@ -112,23 +153,37 @@ By combining these features, Forma templates strike a balance between simplicity
 Forma templates support variable interpolation with optional default values. By default, these variables point to the provided data context. You can use the `:` modifier to access variables from the current scope. This is especially useful inside lists or when passing properties between components.
 
 ```html
-<!-- data context -->
+<!--
+Compiles to `self.name` (the provided data context)
+-->
 Hello {{ name }}
 
-<!-- data context with default value -->
+<!--
+Compiles to `self.user?.name` OR "Guest"
+-->
 Hello {{ user.name -> Guest }} 
 
-<!-- local variable -->
+<!--
+Compiles to `name` (a local variable, e.g. rendering a list)
+-->
 Hello {{: name }}
 ```
 
 Variables are **HTML-encoded** for safety. You can disable this by using the `!` modifier:
 
 ```html
+<!--
+Compiles to `self.content` (the provided data context)
+-->
 {{! content }}
+
+<!--
+Compiles to `content` (a local variable)
+-->
+{{!: content }}
 ```
 
-> *You can combine `!` and `:` as long as the exclamation mark comes first.*
+> ℹ️ *You can combine `!` and `:` as long as the exclamation mark comes first.*
 
 ---
 
@@ -211,7 +266,7 @@ You can define **named slot content** using `<render slot="name">` and consume i
 <main>{{@ children }}</main>
 ```
 
-If a slot isn't rendered, the fallback content inside `<slot>` will be used instead.
+> ℹ️ If a slot isn't rendered, the fallback content inside `<slot>` will be used instead. 
 
 ---
 
@@ -256,28 +311,78 @@ Conditions default to `self.variableName`, but you can use local scoping with `:
 <if condition=": someLocalVariable">...</if>
 ```
 
-### 💡 Examples
+---
+
+### 🔀 Switch-like conditional rendering
+
+Switch-like conditional rendering evaluates a value against multiple cases, much like a traditional switch statement. This helps keep your templates clean and efficient, as the compiler optimizes these constructs into minimal render functions.
+
+```html
+<when variable="status">
+  <case is="loading">Loading...</case>
+  <case is="error">Something went wrong.</case>
+  <default>Unknown status</default>
+</when>
+```
+
+By default, the specified variable points to `self.variableName`, which is the provided data context. Adding a `:` before the variable name points it to a local variable instead.
+
+---
+
+### 🔄 Recursive components
+
+Forma supports recursive components, allowing a component to call itself during rendering. This is particularly useful for scenarios like rendering nested menus, trees, or other hierarchical structures.
+
+> ⚠️ Recursive components should be used with caution to avoid infinite loops or excessive nesting that could impact performance.
+
+```html
+<h1>{{ title }}</h1>
+<ul>
+  <list items as="item">
+    <li>
+      <component self title="{: item.title }" items="{: item.items }" />
+    </li>
+  </list>
+</ul>
+```
+
+To enable recursion, set the `recursive` flag to `true` when compiling the component:
+
+```js
+// we assume that `folder` contains the template above!
+const renderFunction = compile.toFunction(folder, {}, { recursive: true });
+
+const result = renderFunction(
+  {
+    title: 'Top dawg',
+    items: [
+      { title: 'Underdog', items: [ /* ... */ ] },
+      // imagine more items here...
+    ]
+  }
+);
+```
+
+#### Recursive dependencies
+
+To enable recursiveness in dependency components, they must be precompiled with the `recursive` flag set to `true`:
+
+```js
+const nodeComponent = compile.toString(nodeTemplate, {}, { recursive: true });
+const treeComponent = compile.toFunction(treeTemplate, { node: nodeComponent });
+```
+
+---
+
+## 💡 Examples
 
 [Explore practical examples and usage instructions](https://github.com/erik-riklund/forma/blob/main/packages/compiler/docs/EXAMPLES.md) to get started.
 
 ---
 
-## 🚧 Roadmap
-
-- ✔️ Components with block content
-- ✔️ Named slots with default content
-- ✔️ List rendering (including reverse mode)
-- ✔️ Variables with default values and safe lookups
-- ✔️ HTML-encoded variables to avoid script injections (with a modifier to allow raw content)
-- ✔️ Simple conditional rendering
-- ✔️ Self-closing element for components without block content
-- ✔️ Switch-like conditional rendering
-
----
-
 ## 🧐 How it works
 
-The compiler takes your template code and transforms it into JavaScript render functions. These functions generate HTML strings directly — no virtual DOM, no runtime template parsing. This approach ensures minimal overhead and maximum performance, making Forma an excellent choice for server-side rendering.
+The compiler takes your template code and transforms it into JavaScript render functions. These functions utilize [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) to generate HTML strings directly — no virtual DOM, no runtime template parsing. This approach ensures minimal overhead and maximum performance, making Forma an excellent choice for server-side rendering.
 
 ### A very basic template
 
@@ -287,7 +392,9 @@ Let's assume that we have the following template:
 Hello world
 ```
 
-After being compiled, it's transformed to a render function that is safe to cache and reuse in any server-rendered context.
+After being compiled, it's transformed to a render function that is safe to cache and reuse in any server-rendered context. 
+
+> It is most likely safe to use in browsers as well, but this isn't actively tested as it's outside the project's scope. 🔍
 
 ```js
 (self, parent) => {
@@ -295,10 +402,10 @@ After being compiled, it's transformed to a render function that is safe to cach
   parent = parent || {};
   self.__slots = [];
 
-  var v = (t) => typeof t === 'function' ? t() : t;
-  var e = (t) => typeof t === 'string' && t.replaceAll('<','&lt;').replaceAll('>','&gt;') || t;
-  var r = (t) => t !== false && t !== null && t !== undefined;
-  var c = (a,b) => typeof a=== 'number' ? a === parseInt(b) : a === b;
+  const v = (t) => typeof t === 'function' ? t() : t;
+  const e = (t) => typeof t === 'string' && t.replaceAll('<','&lt;').replaceAll('>','&gt;') || t;
+  const r = (t) => t !== false && t !== null && t !== undefined;
+  const c = (a,b) => typeof a=== 'number' ? a === parseInt(b) : a === b;
   
   if (self.__children) {
     self.__children_r = self.__children();
@@ -313,16 +420,7 @@ The helper functions (`v`, `e`, `r`, and `c`) are injected into every compiled t
 - `r`: evaluates truthiness
 - `c`: compares switch values
 
-They are always present as each template works in complete isolation.
-
----
-
-## 🚀 Stress test results
-
-All tests were conducted using the [Bun](https://bun.sh/) runtime for optimal performance benchmarking.
-
-- 🧪 Compiled and rendered 1,000 components in under 100ms
-- 🧪 Compiled 1,003 components and executed 3,001 total renders in ~200ms.
+They are always present, even when not used, as each template is self-contained. They are harmless and will not add a significant overhead to the rendering process.
 
 ---
 

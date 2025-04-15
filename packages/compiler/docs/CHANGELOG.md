@@ -1,14 +1,20 @@
 # Changelog
 
-## [0.2.0] - 2025-04-13
+## [1.1.0] - 2025-04-15
 ### Added
-- **Component System**: Isolated templates with scoped properties and block content.
-- **Named Slots**: Define reusable content areas in components with fallback support.
-- **List Rendering**: Supports `<list>` and `<reverse-list>` for dynamic lists.
-- **Conditional Rendering**: Inline conditionals with `<if>`, `<else-if>`, and `<else>`.
-- **HTML Encoding**: Automatic encoding of variables for XSS prevention with a raw modifier (`!`).
-- **Implicit Attribute Names**: Automatically map attributes to variables using the `~` modifier.
-- **Switch-like Control Flow**: Added `<when>`, `<case>`, and `<default>` for switch-style conditionals.
+- **Recursive components**: Support for components to call themselves recursively.
+- **API options**: Introduced an `options` parameter for API methods, currently supporting the `recursive` flag to enable self-referencing components.
+- **Performance tests**: Added comprehensive performance tests for various scenarios.
+
+## [1.0.0] - 2025-04-13
+### Added
+- **Component system**: Isolated templates with scoped properties and block content.
+- **Named slots**: Define reusable content areas in components with fallback support.
+- **List rendering**: Supports `<list>` and `<reverse-list>` for dynamic lists.
+- **Conditional rendering**: Inline conditionals with `<if>`, `<else-if>`, and `<else>`.
+- **HTML encoding**: Automatic encoding of variables for XSS prevention with a raw modifier (`!`).
+- **Implicit attribute names**: Automatically map attributes to variables using the `~` modifier.
+- **Switch-like control flow**: Added `<when>`, `<case>`, and `<default>` for switch-style conditionals.
 
 ### Changed
 - **API improvements**: Simplified usage and internal structure, enhancing performance.
