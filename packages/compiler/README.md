@@ -344,7 +344,9 @@ Let's assume that we have the following template:
 Hello world
 ```
 
-After being compiled, it's transformed to a render function that is safe to cache and reuse in any server-rendered context. It is most likely safe to use in browsers as well, but this isn't actively tested as it's outside the project's scope. 🔍
+After being compiled, it's transformed to a render function that is safe to cache and reuse in any server-rendered context. 
+
+> It is most likely safe to use in browsers as well, but this isn't actively tested as it's outside the project's scope. 🔍
 
 ```js
 (self, parent) => {
