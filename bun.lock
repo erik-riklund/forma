@@ -8,17 +8,9 @@
         "npm-run-all": "4.1.5",
       },
     },
-    "packages/cache": {
-      "name": "forma-cache",
-      "version": "0.1.0",
-    },
     "packages/compiler": {
       "name": "forma-compile",
-      "version": "1.0.0",
-    },
-    "packages/engine": {
-      "name": "forma-engine",
-      "version": "0.1.0",
+      "version": "1.1.0",
     },
     "packages/loader": {
       "name": "forma-load",
@@ -94,11 +86,7 @@
 
     "for-each": ["for-each@0.3.5", "", { "dependencies": { "is-callable": "^1.2.7" } }, "sha512-dKx12eRCVIzqCxFGplyFKJMPvLEWgmNtUrpTiJIR5u97zEhRG8ySrtboPHZXx7daLxQVrl643cTzbab2tkQjxg=="],
 
-    "forma-cache": ["forma-cache@workspace:packages/cache"],
-
     "forma-compile": ["forma-compile@workspace:packages/compiler"],
-
-    "forma-engine": ["forma-engine@workspace:packages/engine"],
 
     "forma-load": ["forma-load@workspace:packages/loader"],
 
