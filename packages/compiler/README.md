@@ -8,13 +8,13 @@
 
 ### Tiny compiler. Maximum power. ⚡
 
-Looking for an alternative to JSX, Handlebars, or EJS that is **declarative**, **fast**, and **composable**? Forma is built for you.
+Looking for an alternative to JSX, Handlebars, or EJS that is **declarative**, **fast**, **composable**, and features a **simple syntax**? Forma is built for you.
 
 ---
 
 ## 🔦 Highlights
 
-- 📦 **Tiny** — `~3.5kB` runtime with no dependencies
+- 📦 **Tiny** — ~3.5kB runtime with no dependencies
 - 🔒 **Secure by design** — no runtime code evaluation
 - 🧠 **Optimized** — carefully designed to maximize utility without redundancy
 - 🧼 **Isolated** — templates compile into self-contained render functions
@@ -29,6 +29,8 @@ Looking for an alternative to JSX, Handlebars, or EJS that is **declarative**, *
 The compiler delivers a robust feature set with a minimal footprint, making it an excellent fit for modern server-rendered web development. Its focus on server-side rendering ensures simplicity and performance, making it ideal for scenarios where client-side interactivity isn’t required.
 
 > Use complementary tools like [Alpine.js](https://alpinejs.dev/) to layer in lightweight, declarative interactivity while Forma handles secure, server-rendered HTML. This pairing enhances your UI where needed, without adding runtime complexity or compromising security.
+
+---
 
 ### 🔧 Versatile by design
 
@@ -73,13 +75,13 @@ npm install forma-compile
 
 ## ⚙️ Using the compiler
 
-After installing Forma Compile, you can start using its compiler by importing it into your project:
+After installing Forma Compile, you can start using the compiler by importing it into your project:
 
 ```js
 import { compile } from 'forma-compile';
 ```
 
-The `compile` API provides two key methods: `toFunction` and `toString`.
+The `compile` API provides two methods: `toFunction` and `toString`.
 
 ### `toFunction`
 
