@@ -11,18 +11,6 @@ At its core, Forma transforms clean, HTML-like templates into pure JavaScript re
 
 ---
 
-## 💭 Why Forma?
-
-- 📄 **HTML-first and readable**
-- 🔒 **Safe by default** — no runtime logic
-- 🧩 **Components, slots, conditionals, recursion**
-- ⚡ **Blazing-fast** (100k+ renders in ~100ms)
-- ⚙️ **Flexible enough for static sites, emails, PDFs, CLI tools, and more**
-
-Forma provides the advantages of a component-driven UI without the overhead of a traditional frontend framework. It eliminates the need for hydration and virtual DOM, delivering structured HTML optimized for server-side rendering.
-
----
-
 ## 🔧 Overview
 
 The Forma suite is designed to be modular and purpose-driven, with each tool focusing on a specific responsibility within the server-rendered workflow. This approach ensures that you can pick and choose the components you need, enabling a streamlined and efficient development process without unnecessary overhead.
