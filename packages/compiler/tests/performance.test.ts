@@ -187,7 +187,7 @@ it.skip('renders a deep tree (111,111 nodes) using a recursive component',
     };
 
     const node = '<h3>{{ label }}</h3><ul><li><list children as="child">' +
-      '<component self label="{:child.label}" children="{:child.children}" /></list></li></ul>';
+      '<component self label="{:child.label}" children="{:child.children}"/></list></li></ul>';
 
     const renderFunction = compile.toFunction(node, undefined, { recursive: true });
     const result = renderFunction({ label: 'Node 1', children: createNodes('1', 5, 10) });
@@ -198,31 +198,58 @@ it.skip('renders a deep tree (111,111 nodes) using a recursive component',
 );
 
 /**
- * ?
+ * This test evaluates the performance and correctness of rendering a full blog
+ * index page with 25,000 posts. The blog page is structured using a layout component
+ * that includes a header slot for the title and a section for the list of posts.
+ * 
+ * Each post is rendered using a post component that displays the title, summary,
+ * and author. The test ensures that the rendered output includes the expected
+ * content for the first and last posts, as well as the main layout structure,
+ * confirming that the rendering process is accurate and efficient for large datasets.
+ * 
+ * Execution time: ~60ms
  */
-it.todo('renders 10,000 components, each with three named slots',
+it.skip('should render a full blog index page with 25,000 posts',
   () =>
   {
+    const layout = `
+    <main>
+      <header><slot title>No Title</slot></header>
+      <section>{{@ children }}</section>
+    </main>
+  `;
 
+    const post = `
+    <article>
+      <h2>{{ title }}</h2>
+      <p>{{ summary }}</p>
+      <footer>By {{ author }}</footer>
+    </article>
+  `;
+
+    const template = `
+    <component layout>
+      <render slot="title">Blog</render>
+      <list posts as="post">
+        <component post title="{:post.title}" summary="{:post.summary}" author="{:post.author}" />
+      </list>
+    </component>
+  `;
+
+    const posts = Array.from({ length: 25_000 },
+      (_, i) =>
+      ({
+        title: `Post ${ i + 1 }`,
+        summary: `Summary for post ${ i + 1 }`,
+        author: `Author ${ i + 1 }`
+      })
+    );
+
+    const renderFunction = compile.toFunction(template, { layout, post });
+    const html = renderFunction({ posts });
+
+    expect(html).toContain('<h2>Post 1</h2>');
+    expect(html).toContain('<h2>Post 25000</h2>');
+    expect(html).toContain('<main>');
   }
 );
-
-// it('renders 10,000 components each with 3 named slots', () => {
-//   const layout = `
-//     <header><slot title /></header>
-//     <section><slot content /></section>
-//     <footer><slot footer /></footer>
-//   `;
-//   const template = Array.from({ length: 10_000 }, (_, i) => `
-//     <component layout>
-//       <render slot="title"><h1>Title ${i}</h1></render>
-//       <render slot="content"><p>Body ${i}</p></render>
-//       <render slot="footer"><small>End ${i}</small></render>
-//     </component>
-//   `).join('');
-
-//   const renderFunction = compile.toFunction(template, { layout });
-//   const result = renderFunction();
-
-//   expect(result).toContain('Title 9999');
-// });

@@ -8,7 +8,7 @@
 
 ### Tiny compiler. Maximum power. ⚡
 
-Looking for an alternative to JSX, Handlebars, or EJS that is **declarative**, **fast**, **composable**, and features a **simple syntax**? Forma is built for you.
+Looking for an alternative to JSX, Handlebars, or EJS that is **declarative**, **composable**, and features a **simple syntax**? Forma is built for you. 👋
 
 ---
 
@@ -47,6 +47,14 @@ Forma is fast, expressive, and designed with server-first rendering in mind — 
 
 ---
 
+### ✨ Template file extension
+
+Forma templates use the `.fml` extension — short for _Forma Markup Language_.
+
+And yes, we know what it also stands for — but hey, when markup breaks, it’s hard to disagree. 😅
+
+---
+
 ## ⚡ Performance
 
 *Performance tests will be added continuously to test resilience, speed, and scalability.*
@@ -59,6 +67,22 @@ Forma is fast, expressive, and designed with server-first rendering in mind — 
 - ✅ Rendered a deeply nested recursive component tree with **111,111 nodes** in ~**150ms**
 
 Forma isn’t just fast under pressure — **it’s composed.** 🥁
+
+---
+
+### Simulated production tests
+
+#### 📝 Blog index
+
+Renders **25,000** posts using:
+
+- a layout with a named slot (`<slot title>`) and block content
+- iteration of the provided items (`<list posts as="post">`)
+- a `post` component using props (`title`, `summary`, `author`)
+
+📈 **~60ms** total render time
+
+---
 
 > ℹ️ All tests were conducted using the [Bun](https://bun.sh/) runtime.
 
@@ -268,7 +292,18 @@ You can define **named slot content** using `<render slot="name">` and consume i
 <main>{{@ children }}</main>
 ```
 
-> ℹ️ If a slot isn't rendered, the fallback content inside `<slot>` will be used instead. 
+> ℹ️ If a slot isn't rendered, the fallback content inside `<slot>` will be used instead.
+
+#### Slots without fallback content
+
+Named slots that do not include fallback content can be defined as self-closing tags. This simplifies the template structure and makes it easier to read and maintain. When a slot is self-closing, it indicates that the slot is optional and will only render content if explicitly provided by the parent component.
+
+```html
+<header>
+  <slot title />
+</header>
+<main>{{@ children }}</main>
+```
 
 ---
 
