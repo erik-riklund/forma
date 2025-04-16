@@ -118,6 +118,17 @@ describe('components',
       }
     );
 
+    it('should render the block content twice',
+      () =>
+      {
+        const component = '{{@ children }}{{@ children }}';
+        const template = '<component test>Forma is taking shape!</component>';
+        const renderFunction = compile.toFunction(template, { test: component });
+
+        expect(renderFunction()).toBe('Forma is taking shape!'.repeat(2));
+      }
+    );
+
     it('should render a component recursively',
       () =>
       {

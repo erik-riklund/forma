@@ -207,9 +207,9 @@ it.skip('renders a deep tree (111,111 nodes) using a recursive component',
  * content for the first and last posts, as well as the main layout structure,
  * confirming that the rendering process is accurate and efficient for large datasets.
  * 
- * Execution time: ~60ms
+ * Execution time: ~190ms
  */
-it.skip('should render a full blog index page with 25,000 posts',
+it.skip('renders a full blog index page with 100,000 posts',
   () =>
   {
     const layout = `
@@ -236,9 +236,8 @@ it.skip('should render a full blog index page with 25,000 posts',
     </component>
   `;
 
-    const posts = Array.from({ length: 25_000 },
-      (_, i) =>
-      ({
+    const posts = Array.from({ length: 100_000 },
+      (_, i) => ({
         title: `Post ${ i + 1 }`,
         summary: `Summary for post ${ i + 1 }`,
         author: `Author ${ i + 1 }`
@@ -249,7 +248,65 @@ it.skip('should render a full blog index page with 25,000 posts',
     const html = renderFunction({ posts });
 
     expect(html).toContain('<h2>Post 1</h2>');
-    expect(html).toContain('<h2>Post 25000</h2>');
+    expect(html).toContain('<h2>Post 100000</h2>');
     expect(html).toContain('<main>');
+  }
+);
+
+/**
+ * ?
+ */
+it.skip('renders a product grid with 100,000 cards',
+  () =>
+  {
+    const layout = `
+    <section>
+      <header><slot title>No title</slot></header>
+      <div class="grid">{{@ children }}</div>
+    </section>
+  `;
+
+    const productCard = `
+    <article class="product">
+      <h2>{{ name }}</h2>
+      <p>{{ description }}</p>
+      <p class="price">{{ price }}</p>
+
+      <if condition="onSale"><span class="badge">On Sale</span></if>
+      <if condition="outOfStock"><span class="badge danger">Out of stock</span></if>
+    </article>
+  `;
+
+    const template = `
+    <component layout>
+      <render slot="title"><h1>All Products</h1></render>
+      <list products as="product">
+        <component productCard
+          name="{:product.name}"
+          description="{:product.description}"
+          price="{:product.price}"
+          onSale="{:product.onSale}"
+          outOfStock="{:product.outOfStock}" />
+      </list>
+    </component>
+  `;
+
+    const products = Array.from({ length: 100_000 },
+      (_, i) => ({
+        name: `Product ${ i + 1 }`,
+        description: `Description for product ${ i + 1 }`,
+        price: `$${ (i + 1) * 1.1 }`,
+        onSale: i % 10 === 0,
+        outOfStock: i % 17 === 0
+      })
+    );
+
+    const renderFunction = compile.toFunction(template, { layout, productCard });
+    const result = renderFunction({ products });
+
+    expect(result).toContain('Product 1');
+    expect(result).toContain('On Sale');
+    expect(result).toContain('Out of stock');
+    expect(result).toContain('Product 10000');
   }
 );
