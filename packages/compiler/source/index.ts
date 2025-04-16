@@ -128,7 +128,16 @@ const elements: Record<string, Element> =
    * Named slot definition (`<slot name>`).
    * This allows for defining reusable content areas within components.
    */
-  slot: { pattern: /<slot\s+(\w+)>/gs, replacement: `\${v(parent.__slot_$1)||\`` },
+  slot: {
+    pattern: /<slot\s+(\w+)(\s*\/)?>/gs,
+    replacement: (_, ...[name, suffix]) =>
+    {
+      const closed = suffix?.endsWith('/');
+
+      return `\${v(parent.__slot_${ name })||\`${ closed ? '`}' : '' }`;
+    }
+  },
+
   slotEnd: { pattern: /<\/slot>/gs, replacement: '`}' },
 
   /**
