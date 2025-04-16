@@ -5,7 +5,7 @@
 ### Build with structure, render with purpose. 🚀  
 > _Please note that this project is a work in progress_ 😃
 
-**Forma** is a ~3.5kB declarative template compiler — and the foundation of a focused suite of tools for building secure, fast, and expressive server-rendered applications.
+**Forma** is a ~3.5kB declarative template compiler — and the foundation of a focused suite of tools for building server-rendered applications.
 
 At its core, Forma transforms clean, HTML-like templates into pure JavaScript render functions with no runtime parsing or client-side dependencies. It's designed for developers who want to build applications using templates with **less logic** and **more intent**.
 
