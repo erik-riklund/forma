@@ -28,27 +28,43 @@ const elements: Record<string, Element> =
    */
   variable:
   {
-    pattern: /(\{\{?)\s*(!?:?)?\s*(\w+(?:\.\w+)*)\s*(?:->\s*([^\}]+)\s*)?\}?\}/gs,
+    pattern: /\{\{\s*((?:!|o)?:?)?\s*(\w+(?:\.\w+)*)\s*((?:->\s*(?:(?:\w+(?:\.\w+)*)|(?:"[^"]+"))\s*)*)\s*\}\}/gs,
 
-    replacement: (_, ...[braces, scope, name, value]) =>
+    replacement: (_, ...[scope, variable, fallbacks]) =>
     {
-      const path = name.replaceAll(`.`, `?.`);
-      const prefix = scope?.endsWith(':') ? '' : 'self.';
+      const safePath = variable.replaceAll(`.`, `?.`);
+      const scopePrefix = scope?.endsWith(':') ? '' : 'self.';
 
-      if (braces === '{{')
-      {
-        const useEncoder = !scope?.startsWith('!');
-        const before = useEncoder ? `e(` : '';
-        const after = useEncoder ? ')' : '';
+      const useEncoder = !scope?.startsWith('!') && !scope?.startsWith('o');
+      const encoderPrefix = useEncoder ? `e(` : '';
+      const encoderSuffix = useEncoder ? ')' : '';
 
-        const defaultValue = value?.replaceAll(`'`, `\\'`).trim() || '';
-        return `\${${ before }v(${ prefix }${ path })||'${ defaultValue }'${ after }}`;
-      }
-      else
+      const defaultValues: string[] = [];
+
+      if (fallbacks.length)
       {
-        const defaultValue = value || null; // non-string values (marked by single braces).
-        return `v(${ prefix }${ path })${ defaultValue ? `||${ defaultValue }` : '' }`;
+        const fallbackValues = fallbacks.split('->').map(x => x.trim()).filter(Boolean);
+
+        for (const fallbackValue of fallbackValues)
+        {
+          if (fallbackValue.startsWith('"') && fallbackValue.endsWith('"'))
+          {
+            defaultValues.push(`'${ fallbackValue.slice(1, -1).replaceAll("'", "\\'") }'`);
+          }
+          else
+          {
+            const fallbackScope = fallbackValue.startsWith(':') ? '' : 'self.';
+            const fallbackVariable = (!fallbackScope.length ? fallbackValue.slice(1) : fallbackValue).replaceAll('.', '?.');
+
+            defaultValues.push(fallbackScope + fallbackVariable);
+          }
+        }
       }
+
+      defaultValues.push(`''`);
+
+      return `\${${ encoderPrefix }v(${ scopePrefix }${ safePath }` +
+        `||${ defaultValues.join('||') })${ encoderSuffix }}`;
     }
   },
 
@@ -82,7 +98,7 @@ const elements: Record<string, Element> =
     replacement: (_, ...[name, attributes]) =>
     {
       const context: string[] = [];
-      const properties = attributes?.matchAll(/(?<=^|\s)(?:(~?\w+)(?:="([^"]+)")?)/gs);
+      const properties = attributes?.matchAll(/(?<=^|\s)(?:(~?\w+)(?:="(.*?)(?<!\\)")?)/gs);
       const closed = attributes?.endsWith('/');
 
       if (properties)
@@ -93,7 +109,7 @@ const elements: Record<string, Element> =
           const key = name.startsWith('~') ? name.slice(1) : name;
 
           const variable = value ?
-            (/^v\(\w+(?:\??\.\w+)*\)$/s.test(value) ? value : `'${ value }'`) :
+            (/^\$\{(?:e\()?v\(/.test(value) ? value.slice(2, -1) : `'${ value }'`) :
             `(typeof ${ key }!=='undefined'&&v(${ key }))||v(self.${ key.replaceAll('.', '?.') })||undefined`;
 
           context.push(`${ key }:${ variable }`);
@@ -113,16 +129,27 @@ const elements: Record<string, Element> =
    */
   list:
   {
-    pattern: /<(reverse-)?list\s+(\w+)\s+as="\s*(\w+)\s*">/gs,
+    pattern: /<(reverse-)?list\s+(\w+(?:\.\w+)*)\s+as="\s*(\w+)\s*">/gs,
 
     replacement: (_, ...[prefix, source, variable]) =>
     {
-      const reverse = prefix === 'reverse-' ? '.reverse()' : '';
-      return `\${(v(self.${ source })||null)?${ reverse }.map(${ variable }=>\``;
+      const safeSourcePath = source.replaceAll('.', '?.');
+      const localVariable = safeSourcePath.includes('?.') ? safeSourcePath.slice(0, safeSourcePath.indexOf('?')) : safeSourcePath;
+      const localScope = `typeof ${ localVariable }!=='undefined'&&${ safeSourcePath }`;
+      const reverseFunctionCall = prefix === 'reverse-' ? '.reverse()' : '';
+
+      return `\${(()=>{let o='';const l=v(${ localScope }||self.${ safeSourcePath })||[];` +
+        `if(l.length){for(const ${ variable } of l${ reverseFunctionCall }){o+=\``;
     }
   },
 
-  listEnd: { pattern: /<\/(?:reverse-)?list>/gs, replacement: `\`).join('')}` },
+  listEnd: { pattern: /<\/(?:reverse-)?list>/gs, replacement: `\`}}return o})()}` },
+
+  // `if(true)` ensures we match the open `{` brace count in the list block.
+  // Otherwise, the fallback block would cause a syntax error due to mismatched braces.
+  listFallback: { pattern: /<empty>/g, replacement: `\`}}else{if(true){o=\`` },
+
+  listFallbackEnd: { pattern: /<\/empty>/gs, replacement: '' },
 
   /**
    * Named slot definition (`<slot name>`).
@@ -225,7 +252,7 @@ const compileDependencies = (dependencies: Dependencies): string =>
 
       return template.startsWith('(self,parent)=>{')
         ? `const __${ name }=${ template };` // precompiled template.
-        : `const __${ name }=${ compile.toString(template) };`;
+        : `const __${ name }=${ compile.toString(template, undefined, { helpers: false }) };`;
     }
   );
   return result.join('');
@@ -248,23 +275,28 @@ const parseSlots = (template: Template): string =>
  * 
  * @param template - The template string to be compiled.
  * @param dependencies - An object containing dependencies to be compiled.
+ * @param helpers - ?
  * @returns A string containing the compiled template body.
  */
-const compileTemplate = (
-  template: Template, dependencies: Dependencies = {}): string =>
+const compileTemplate = (template: Template,
+  dependencies: Dependencies = {}, helpers: boolean = true): string =>
 {
-  let body =
-    `self=self||{};parent=parent||{};` +
-    `self.__slots=[${ parseSlots(template) }];` +
+  const helperFunctions =
     `const v=(t)=>typeof t==='function'?t():t;` +
     `const e=(t)=>typeof t==='string'&&t.replaceAll('<','&lt;').replaceAll('>','&gt;')||t;` +
     `const r=(t)=>t!==false&&t!==null&&t!==undefined;` +
-    `const c=(a,b)=>typeof a==='number'?a===parseInt(b):a===b;` +
-    compileDependencies(dependencies) +
-    `if(self.__children){self.__children_r=self.__children()}` +
-    `return \`${ parseElements(template) }\`;`;
+    `const c=(a,b)=>typeof a==='number'?a===parseInt(b):a===b;`;
 
-  return body;
+  let body = [
+    `self=self||{};parent=parent||{};`,
+    `self.__slots=[${ parseSlots(template) }];`,
+    helpers !== false ? helperFunctions : '',
+    compileDependencies(dependencies),
+    `if(self.__children){self.__children_r=self.__children()}`,
+    `return \`${ parseElements(template) }\`;`
+  ];
+
+  return body.join('');
 };
 
 /**
@@ -283,14 +315,14 @@ export const compile =
    */
   toFunction: (
     template: Template, dependencies: Dependencies = {},
-    { recursive }: Options = {}): RenderFunction =>
+    { helpers, recursive }: Options = {}): RenderFunction =>
   {
     if (recursive === true)
     {
       dependencies.self = template;
     }
 
-    const body = compileTemplate(template, dependencies);
+    const body = compileTemplate(template, dependencies, helpers);
     return new Function('self', 'parent', body) as RenderFunction;
   },
 
@@ -304,13 +336,13 @@ export const compile =
    */
   toString: (
     template: Template, dependencies: Dependencies = {},
-    { recursive }: Options = {}): string =>
+    { helpers, recursive }: Options = {}): string =>
   {
     if (recursive === true)
     {
       dependencies.self = template;
     }
 
-    return `(self,parent)=>{${ compileTemplate(template, dependencies) }}`;
+    return `(self,parent)=>{${ compileTemplate(template, dependencies, helpers) }}`;
   }
 };

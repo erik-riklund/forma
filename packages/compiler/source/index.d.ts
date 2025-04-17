@@ -17,6 +17,11 @@ export interface Element
 export interface Options
 {
   /**
+   * Specifies whether to include helper functions in the compiled output.
+   */
+  helpers?: boolean;
+  
+  /**
    * Specifies whether a component is able to call itself recursively.
    */
   recursive?: boolean;
