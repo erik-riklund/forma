@@ -24,11 +24,9 @@ Okay okay, maybe not lunar levels of impact — but if you're looking to leave c
 
 ---
 
-**Forma** is a declarative, component-based template compiler designed to streamline server-side rendering. With its clean and minimal syntax, Forma transforms templates into secure, self-contained render functions, enabling the creation of fast, lightweight, and scalable applications.
+**Forma** is a declarative, component-based template compiler designed for server-side rendering. With its clean and readable syntax, Forma transforms templates into secure, self-contained render functions, enabling the creation of fast and scalable server-focused applications.
 
-The compiler delivers a robust feature set with a minimal footprint, making it an excellent fit for modern server-rendered web development. Its focus on server-side rendering ensures simplicity and performance, making it ideal for scenarios where client-side interactivity isn’t required.
-
-> Use complementary tools like [Alpine.js](https://alpinejs.dev/) to layer in lightweight, declarative interactivity while Forma handles secure, server-rendered HTML. This pairing enhances your UI where needed, without adding runtime complexity or compromising security.
+> ℹ️ Use complementary tools like [Alpine.js](https://alpinejs.dev/) to layer in lightweight, declarative interactivity while Forma handles secure, server-rendered HTML. This pairing enhances your UI where needed, without adding runtime complexity or compromising security.
 
 ---
 
@@ -124,9 +122,9 @@ Both `toFunction` and `toString` share the same set of parameters:
 
 ---
 
-### ✨ Official template file extension
+### ✨ Official file extension
 
-We encourage you to use the `.fml` extension — short for _Forma Markup Language_.  
+You are encouraged to use the `.fml` extension — short for _Forma Markup Language_.  
 
 We get it, the acronym might raise an eyebrow or two — but when composing templates is this smooth, you’ll be saying it for all the right reasons. 😄
 
@@ -183,22 +181,27 @@ Hello {{ user.profile.name -> user.name -> "Guest" }}
 
 ### 🔒 Secure by design
 
+> ⚠️ Disabling HTML encoding without proper validation can expose your application to security vulnerabilities.
+
 Variables are **HTML-encoded** for safety. This ensures that any potentially malicious content, such as `<script>` tags or other HTML elements, is rendered as plain text rather than being executed in the browser. This is a critical security measure to prevent [Cross-Site Scripting (XSS) attacks](https://owasp.org/www-community/attacks/xss/), where attackers inject malicious scripts into web pages viewed by other users.
 
-You can disable this by using the `!` modifier, which tells the system to render the variable as raw HTML. However, use this feature cautiously and only when you are certain that the content is safe and does not contain any untrusted or user-generated input.
-
-> ⚠️ Disabling HTML encoding without proper validation can expose your application to security vulnerabilities.
+You can override this by using the `!` modifier, which tells the system to render the variable as raw HTML. However, use this feature cautiously and only when you are certain that the content is safe and does not contain any untrusted or user-generated input.
 
 ```html
 <!--
-Compiles to `self.content` (the provided data context)
--->
+Compiles to `self.content` (the provided data context) -->
+
 {{! content }}
 
 <!--
-Compiles to `content` (a local variable)
--->
+Compiles to `content` (a local variable) -->
+
 {{!: content }}
+
+<!--
+ -->
+
+{{:  }}
 ```
 
 > ℹ️ *You can combine `!` and `:` as long as the exclamation mark comes first.*
@@ -208,8 +211,6 @@ Compiles to `content` (a local variable)
 ### 🧩 Components
 
 Components are modular elements that encapsulate both structure and functionality. They support **properties**, which allow you to pass dynamic data into the component, enabling customization and reusability. Additionally, components can include **block content**, providing a way to define content within the component's structure. This flexibility makes it easy to create complex, hierarchical UIs while maintaining a clean and declarative syntax.
-
-Components are designed to be self-contained, meaning they manage their own scope and do not interfere with other components. This isolation ensures predictable behavior and simplifies debugging. Furthermore, components can leverage [**named slots**](#🔌-named-slots) to define specific areas where custom content can be injected, offering even more control over layout and design.
 
 ```html
 <!-- 'button' here refers to the component name, not an HTML tag -->
@@ -223,6 +224,8 @@ Components are designed to be self-contained, meaning they manage their own scop
 <!-- with block content -->
 <component button>Click me</component>
 ```
+
+Components are designed to be self-contained, meaning they manage their own scope and do not interfere with other components. This isolation ensures predictable behavior and simplifies debugging. Furthermore, components can leverage [**named slots**](#🔌-named-slots) to define specific areas where custom content can be injected, offering even more control over layout and design.
 
 ---
 
@@ -242,15 +245,9 @@ Forma allows you to define properties implicitly using the `~` prefix. This feat
 
 ---
 
-#### Passing dynamic property values
+#### Passing non-string property values
 
-Dynamic property values allow you to seamlessly bind data to your components, ensuring that they remain flexible and adaptable to different contexts. By using `{...}`, you can inject values directly from your data context or local variables.
-
-```html
-<component profile name="{ user.name }" age="{: age }" />
-```
-
-> ⚠️ Dynamic property values are passed as raw values. To ensure safety and prevent unintended behavior, validate or sanitize the data before passing it to the component.
+?
 
 ---
 
@@ -314,30 +311,71 @@ Slots without fallback content can use self-closing tags, simplifying the struct
 
 ### 🔁 Rendering lists
 
-Forma includes built-in iteration via `<list>` and `<reverse-list>`:
+The `<list>` and `<reverse-list>` tags allow you to iterate over arrays of data, rendering each item within the specified block. The `as` attribute defines the name of the variable that represents the current item in the iteration. This variable is scoped locally to the block, ensuring no conflicts with other variables in your template.
 
 ```html
 <list users as="user">
   <li>{{: user.name }}</li>
 </list>
+```
 
-<reverse-list items as="item">
-  <p>{{: item }}</p>
+`<reverse-list>` works the same as `<list>`, but iterates over the array in reverse order:
+
+```html
+<reverse-list users as="user">
+  <p>{{: user.name }}</p>
 </reverse-list>
 ```
 
-All items are automatically scoped as the variable you define (e.g. `user`, `item`).
+You can nest `<list>` or `<reverse-list>` tags to iterate over nested arrays. Each nested block has its own scoped variable, ensuring clarity and avoiding conflicts.
+
+```html
+<list categories as="category">
+  <h2>{{: category.name }}</h2>
+  <list category.items as="item">
+    <p>{{: item.name }}</p>
+  </list>
+</list>
+```
+
+Empty arrays can be handled using the `<empty>` tag within a `<list>` or `<reverse-list>` block:
+
+```html
+<list users as="user">
+  <li>{{: user.name }}</li>
+  <empty>
+    <p>No users found.</p>
+  </empty>
+</list>
+```
+
+> ℹ️ The `<empty>` block must be placed at the end of the `<list>` block.
 
 ---
 
 ### 🔀 Conditional rendering
 
-Forma supports inline control flow with `<if>`, `<else-if>`, and `<else>`:
+Inline control flow can be achieved with `<if>`, `<else-if>`, and `<else>` tags. These tags enable you to conditionally render content based on dynamic values. These tags provide a clean and declarative way to handle conditional logic directly within your components.
+
+The `<if>` tag evaluates a variable and renders its content if the value is truthy:
 
 ```html
-<if condition="loggedIn">Welcome back!</if>
-<if not condition="loggedIn">Please log in.</if>
+<!-- Checks if `self.loggedIn` is truthy -->
 
+<if condition="loggedIn">Welcome back!</if>
+```
+
+To handle the opposite case, you can use the `not` modifier:
+
+```html
+<!-- Checks if the local variable `loggedIn` is truthy -->
+
+<if not condition=":loggedIn">Please log in.</if>
+```
+
+For more complex scenarios, you can chain conditions using `<else-if>` and `<else>` tags. This allows you to handle multiple cases in a structured and readable manner:
+
+```html
 <if condition="a">
   A is true
 <else-if condition="b">
@@ -347,17 +385,29 @@ Forma supports inline control flow with `<if>`, `<else-if>`, and `<else>`:
 </if>
 ```
 
-Conditions default to `self.variableName`, but you can use local scoping with `:`:
+### Nesting conditions
+
+You can nest `<if>` blocks to handle more intricate logic. Each nested block evaluates its condition independently, allowing for highly customizable rendering:
 
 ```html
-<if condition=": someLocalVariable">...</if>
+<if condition="user">
+  <p>Welcome, {{ user.name }}!</p>
+  
+  <if condition="user.isAdmin">
+    <p>You have admin privileges.</p>
+  </if>
+<else>
+  <p>Please log in to continue.</p>
+</if>
 ```
 
 ---
 
 ### 🔀 Switch-like conditional rendering
 
-Switch-like conditional rendering evaluates a value against multiple cases, much like a traditional switch statement. This helps keep your templates clean and efficient, as the compiler optimizes these constructs into minimal render functions.
+Switch-like conditional rendering evaluates a value against multiple cases, much like a traditional switch statement. This helps keep your components clean and efficient, as the compiler optimizes these constructs into efficient code that evaluates conditions sequentially, ensuring fast and predictable performance.
+
+The `<when>` tag is used to define the variable being evaluated, while `<case>` tags specify the conditions to match. A `<default>` tag can be included to handle cases where no match is found.
 
 ```html
 <when variable="status">
@@ -367,47 +417,70 @@ Switch-like conditional rendering evaluates a value against multiple cases, much
 </when>
 ```
 
-By default, the specified variable points to `self.variableName`, which is the provided data context. Adding a `:` before the variable name points it to a local variable instead.
+Switch-like rendering can be nested to handle more complex scenarios. Each nested `<when>` block evaluates its variable independently, allowing for highly customizable rendering.
+
+```html
+<when variable="user.role">
+  <case is="admin">
+    <p>Welcome, Admin!</p>
+
+    <when variable="user.level">
+      <case is="1">You have basic admin privileges.</case>
+      <case is="2">You have advanced admin privileges.</case>
+    </when>
+  </case>
+  <case is="user">Welcome, User!</case>
+  <default>Please log in.</default>
+</when>
+```
+
+The `<default>` tag is optional but recommended to handle cases where no `<case>` matches. If omitted, no content will be rendered for unmatched cases.
+
+```html
+<when variable="status">
+  <case is="success">Operation successful!</case>
+  <case is="error">Operation failed.</case>
+  
+  <!-- No default case -->
+</when>
+```
+
+> ℹ️ Use `<when>` tags for scenarios with multiple discrete conditions to improve readability and maintainability.
 
 ---
 
 ### 🔄 Recursive components
 
-> ⚠️ Recursive components should be used with caution to avoid infinite loops or excessive nesting that could impact performance.
+> ⚠️ Recursive components should be used with caution to avoid infinite loops.
 
-Forma supports recursive components, which enables a template to call itself — useful for trees or nested structures.
+There is support for recursive components, which enables a template to call itself — useful for trees or nested structures. This feature is particularly beneficial when working with hierarchical data, such as file systems, organizational charts, or nested menus. Recursive components allow you to define a single template that can handle any level of nesting, simplifying your code and improving maintainability.
+
+To use recursive components, ensure that the `recursive` flag is set to `true` during compilation. This flag enables the compiler to handle self-references within the template, ensuring that the component can call itself without causing errors.
+
+Here's an example of a recursive component for rendering a tree structure:
 
 ```html
-<h1>{{ title }}</h1>
-<ul>
-  <list items as="item">
-    <li>
-      <component self title="{: item.title }" items="{: item.items }" />
-    </li>
-  </list>
-</ul>
+<component tree>
+  <h1>{{ title }}</h1>
+  <ul>
+    <list items as="item">
+      <li>
+        <component self title="{{: item.title }}" items="{{: item.items }}" />
+      </li>
+    </list>
+  </ul>
+</component>
 ```
 
-To enable recursion, set the `recursive` flag to `true` when compiling the component:
+In this example, the `tree` component calls itself for each child node, passing the appropriate data for the next level of the hierarchy. This approach ensures that the component can handle any depth of nesting dynamically.
 
-```js
-// We assume that `folder` contains the template above!
-const renderFunction = compile.toFunction(folder, {}, { recursive: true });
+When designing recursive components, it's important to include a termination condition to prevent infinite loops. For example, you might check whether a node has children before rendering further nested components. This ensures that the recursion stops at the appropriate level, avoiding performance issues or stack overflows.
 
-const result = renderFunction(
-  {
-    title: 'Top dawg',
-    items: [
-      { title: 'Underdog', items: [ /* ... */ ] },
-      // … and additional nested items as needed.
-    ]
-  }
-);
-```
+> ℹ️ Excessive nesting or deeply recursive structures can impact performance, so always test your templates with realistic data to ensure they perform as expected.
 
 #### Recursive dependencies
 
-To enable recursiveness in dependency components, they must be precompiled with the `recursive` flag set to `true`:
+Recursive dependency components must be precompiled with the `recursive` flag set to `true`:
 
 ```js
 const nodeComponent = compile.toString(nodeTemplate, {}, { recursive: true });
@@ -444,20 +517,29 @@ Forma's lightweight, server-first design, coupled with its exceptional performan
 
 The compiler takes your template code and transforms it into JavaScript render functions. These functions utilize [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) to generate HTML strings directly — no virtual DOM, no runtime template parsing. This approach ensures minimal overhead and maximum performance, making Forma an excellent choice for server-side rendering.
 
-### A very basic template
+### Example: Rendering a list with fallback content
 
-Let's assume that we have the following template:
+To see how Forma works in practice, consider this template that displays a list of users. If the list is empty, it falls back to a default message:
 
 ```html
-Hello world
+<ul>
+  <list users as="user">
+    <li>{{: user.name }}</li>
+    <empty>
+      <li>No content</li>
+    </empty>
+  </list>
+</ul>
 ```
 
-After being compiled, it's transformed to a render function that is safe to cache and reuse in any server-rendered context. 
+> ℹ️ The `<empty>` block must be placed at the end of the `<list>` block.
 
-> It's likely safe to use in browsers as well, but this isn't actively tested as it's outside the project's scope. 🔍
+Forma compiles this into a render function that outputs a complete HTML string. The generated function is entirely static, side-effect-free, and safe to cache and reuse in any server-rendered context:
+
+> While Forma's output can likely be used in browsers, this isn't a primary focus and is not actively tested. 🔍
 
 ```js
-// This is what Forma compiles your markup into:
+// This is what Forma compiles the markup into:
 
 (self, parent) => {
   self = self || {};
@@ -465,24 +547,42 @@ After being compiled, it's transformed to a render function that is safe to cach
   self.__slots = [];
 
   const v = (t) => typeof t === 'function' ? t() : t;
-  const e = (t) => typeof t === 'string' && t.replaceAll('<','&lt;').replaceAll('>','&gt;') || t;
+  const e = (t) => typeof t === 'string' && t.replaceAll('<', '&lt;').replaceAll('>', '&gt;') || t;
   const r = (t) => t !== false && t !== null && t !== undefined;
-  const c = (a,b) => typeof a=== 'number' ? a === parseInt(b) : a === b;
-  
+  const c = (a, b) => typeof a === 'number' ? a === parseInt(b) : a === b;
+
   if (self.__children) {
     self.__children_r = self.__children();
   }
-  return `Hello world`;
+
+  return `<ul>${
+    (() => {
+      let o = '';
+      const l = v(self.users) || [];
+      if (l.length) {
+        for (const user of l) {
+          o += `<li>${e(v(user?.name || ''))}</li>`;
+        }
+      } else {
+        // The if statement is a hack to match the brace level :)
+        if (true) {
+          o = `<li>No content</li>`;
+        }
+      }
+      return o;
+    })()
+  }</ul>`;
 };
 ```
 
-The helper functions (`v`, `e`, `r`, and `c`) are injected into every compiled function:
-- `v`: safely resolves function values
-- `e`: encodes HTML
-- `r`: evaluates truthiness
-- `c`: compares switch values
+The compiler injects a set of lightweight utility functions into every top-level render function:
 
-They are always present, even when not used, as each render function is self-contained. These functions are pure, side-effect-free, and add no runtime security concerns or performance overhead.
+- `v`: resolves dynamic values safely (e.g., unwrapping functions)
+- `e`: escapes HTML to prevent injection
+- `r`: checks whether a value is "renderable" (truthy and defined)
+- `c`: compares values in conditional or `switch` constructs
+
+These helpers are always included to ensure that the render function is self-contained. They are pure, side-effect-free, and designed for performance and safety.
 
 ---
 
