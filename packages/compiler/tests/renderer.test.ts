@@ -27,7 +27,7 @@ describe('variables',
     it('should render context variables with default values',
       () =>
       {
-        const template = '<img src="{{ source -> https://example.com/default.jpg }}">';
+        const template = '<img src="{{ source -> "https://example.com/default.jpg" }}">';
         const renderFunction = compile.toFunction(template);
 
         expect(renderFunction({ source: 'https://example.com/image.jpg' }))
@@ -37,7 +37,19 @@ describe('variables',
       }
     );
 
-    it('should render context variables with functions',
+    it('should render context variables with multiple default values',
+      () =>
+      {
+        const template = 'Hello {{ name -> alias -> "friend" }}!';
+        const renderFunction = compile.toFunction(template);
+
+        expect(renderFunction({ name: 'John' })).toBe('Hello John!');
+        expect(renderFunction({ alias: 'Doe' })).toBe('Hello Doe!');
+        expect(renderFunction({})).toBe('Hello friend!');
+      }
+    );
+
+    it('should render context variables with function values',
       () =>
       {
         const template = 'Hello {{ user.name }}';
@@ -87,9 +99,9 @@ describe('components',
     it('should render a component with an implicit attribute',
       () =>
       {
-        const component = '<list articles as="article"><h1>{{: article.title }}</h1></list>';
+        const article = '<list articles as="article"><h1>{{: article.title }}</h1></list>';
         const template = '<component article ~articles></component>';
-        const renderFunction = compile.toFunction(template, { article: component });
+        const renderFunction = compile.toFunction(template, { article });
 
         const articles = [{ title: 'Article 1' }, { title: 'Article 2' }];
         expect(renderFunction({ articles })).toBe('<h1>Article 1</h1><h1>Article 2</h1>');
@@ -148,7 +160,7 @@ describe('components',
         };
 
         const node = '<h3>{{ label }}</h3><ul><li><list children as="child">' +
-          '<component self label="{:child.label}" children="{:child.children}" /></list></li></ul>';
+          '<component self label="{{:child.label}}" children="{{o:child.children}}" /></list></li></ul>';
 
         const renderFunction = compile.toFunction(node, undefined, { recursive: true });
         const result = renderFunction({ label: 'Node 1', children: createNodes('1', 2, 3) });
@@ -178,9 +190,9 @@ describe('components',
 
         const tree = '<component node ~label ~children />';
         const node = '<h3>{{ label }}</h3><ul><li><list children as="child">' +
-          '<component self label="{:child.label}" children="{:child.children}" /></list></li></ul>';
+          '<component self label="{{:child.label}}" children="{{o:child.children}}" /></list></li></ul>';
 
-        const nodeComponent = compile.toString(node, undefined, { recursive: true });
+        const nodeComponent = compile.toString(node, undefined, { helpers: false, recursive: true });
         const renderFunction = compile.toFunction(tree, { node: nodeComponent });
         const result = renderFunction({ label: 'Node 1', children: createNodes('1', 2, 3) });
 
@@ -205,6 +217,20 @@ describe('lists',
       }
     );
 
+    it('should render the fallback content when the list is empty',
+      () =>
+      {
+        const template =
+          '<ul><list users as="user"><li>{{: user.name }}</li>' +
+          '<empty><li>No content</li></empty></list></ul>';
+        const renderFunction = compile.toFunction(template);
+
+        console.log(compile.toString(template));
+
+        expect(renderFunction({ users: [] })).toBe('<ul><li>No content</li></ul>');
+      }
+    );
+
     it('should render a list in reverse',
       () =>
       {
@@ -219,7 +245,7 @@ describe('lists',
     it('should render a list passed to a nested component',
       () =>
       {
-        const template = '<component userList users="{ users }"></component>';
+        const template = '<component userList users="{{users}}"></component>';
         const userList = '<ul><list users as="user"><li>{{: user.name }}</li></list></ul>';
         const renderFunction = compile.toFunction(template, { userList });
 
@@ -232,11 +258,34 @@ describe('lists',
       () =>
       {
         const userList = '<li>{{ user.name }}</li>';
-        const template = '<ul><list users as="user"><component userList user="{: user }"></component></list></ul>';
+        const template = '<ul><list users as="user"><component userList user="{{: user }}"></component></list></ul>';
         const renderFunction = compile.toFunction(template, { userList });
 
         const context = { users: [{ name: 'John' }, { name: 'Jane' }] };
         expect(renderFunction(context)).toBe('<ul><li>John</li><li>Jane</li></ul>');
+      }
+    );
+
+    it('should render nested lists',
+      () =>
+      {
+        const template =
+          '<ul><list users as="user"><li>{{: user.name }}<ul><list user.pets as="pet">' +
+          '<li>{{: pet.name }}</li></list></ul></li></list></ul>';
+        console.log(compile.toString(template));
+        const renderFunction = compile.toFunction(template);
+
+        const context = {
+          users: [
+            { name: 'John', pets: [{ name: 'Scar' }, { name: 'Mufasa' }] },
+            { name: 'Jane', pets: [{ name: 'Purr' }] }
+          ]
+        };
+
+        expect(renderFunction(context)).toBe(
+          '<ul><li>John<ul><li>Scar</li><li>Mufasa</li></ul></li>' +
+          '<li>Jane<ul><li>Purr</li></ul></li></ul>'
+        );
       }
     );
   }
@@ -343,6 +392,13 @@ describe('conditions',
       }
     );
 
+    it.todo('should render nested conditional blocks',
+      () =>
+      {
+        // ...
+      }
+    );
+
     it('should render the correct switch case block (strings)',
       () =>
       {
@@ -366,6 +422,13 @@ describe('conditions',
         expect(renderFunction({ test: 1 })).toBe('A');
         expect(renderFunction({ test: 2 })).toBe('B');
         expect(renderFunction({ test: 3 })).toBe('Default');
+      }
+    );
+
+    it.todo('should render nested switch blocks',
+      () =>
+      {
+        // ...
       }
     );
   }

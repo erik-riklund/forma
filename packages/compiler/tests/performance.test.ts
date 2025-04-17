@@ -99,7 +99,7 @@ it.skip('compiles and renders a component with two dependencies 1,000 times',
  * each iteration, confirming that the rendering process is accurate and efficient
  * when handling lists with multiple items.
  * 
- * Execution time: ~50ms
+ * Execution time: ~30ms
  */
 it.skip('renders a list with 100 items using a precompiled component 1000 times',
   () =>
@@ -166,7 +166,7 @@ it.skip('compiles and renders a component and its 100 dependencies 100 times',
  * node and the deepest node, confirming that the recursive rendering process is accurate
  * and efficient for large hierarchical structures.
  * 
- * Execution time: ~150ms
+ * Execution time: ~110ms
  */
 it.skip('renders a deep tree (111,111 nodes) using a recursive component',
   () =>
@@ -187,7 +187,7 @@ it.skip('renders a deep tree (111,111 nodes) using a recursive component',
     };
 
     const node = '<h3>{{ label }}</h3><ul><li><list children as="child">' +
-      '<component self label="{:child.label}" children="{:child.children}"/></list></li></ul>';
+      '<component self label="{{:child.label}}" children="{{o:child.children}}"/></list></li></ul>';
 
     const renderFunction = compile.toFunction(node, undefined, { recursive: true });
     const result = renderFunction({ label: 'Node 1', children: createNodes('1', 5, 10) });
@@ -207,7 +207,7 @@ it.skip('renders a deep tree (111,111 nodes) using a recursive component',
  * content for the first and last posts, as well as the main layout structure,
  * confirming that the rendering process is accurate and efficient for large datasets.
  * 
- * Execution time: ~190ms
+ * Execution time: ~180ms
  */
 it.skip('renders a full blog index page with 100,000 posts',
   () =>
@@ -231,7 +231,7 @@ it.skip('renders a full blog index page with 100,000 posts',
     <component layout>
       <render slot="title">Blog</render>
       <list posts as="post">
-        <component post title="{:post.title}" summary="{:post.summary}" author="{:post.author}" />
+        <component post title="{{:post.title}}" summary="{{:post.summary}}" author="{{:post.author}}" />
       </list>
     </component>
   `;
@@ -255,6 +255,8 @@ it.skip('renders a full blog index page with 100,000 posts',
 
 /**
  * ?
+ * 
+ * Execution time: ~230ms
  */
 it.skip('renders a product grid with 100,000 cards',
   () =>
@@ -282,11 +284,11 @@ it.skip('renders a product grid with 100,000 cards',
       <render slot="title"><h1>All Products</h1></render>
       <list products as="product">
         <component productCard
-          name="{:product.name}"
-          description="{:product.description}"
-          price="{:product.price}"
-          onSale="{:product.onSale}"
-          outOfStock="{:product.outOfStock}" />
+          name="{{:product.name}}"
+          description="{{:product.description}}"
+          price="{{:product.price}}"
+          onSale="{{:product.onSale}}"
+          outOfStock="{{:product.outOfStock}}" />
       </list>
     </component>
   `;
