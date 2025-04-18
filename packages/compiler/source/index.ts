@@ -7,8 +7,34 @@ import type {
 } from 'types';
 
 /**
+ * ?
+ * 
+ * @param variable - The variable to be transformed.
+ * @returns The transformed variable path.
+ */
+const createContextVariablePath = (variable: string): string =>
+{
+  return `self.${ variable.replaceAll('.', '?.') }`;
+};
+
+/**
+ * ?
+ * 
+ * @param variable - The variable path to be transformed.
+ * @returns The transformed variable path.
+ */
+const createLocalVariablePath = (variable: string): string =>
+{
+  const safeVariablePath = variable.replaceAll('.', '?.');
+  const baseVariableName = variable.includes('.') ? variable.slice(0, variable.indexOf('.')) : variable;
+  const safeVariableLookup = `(typeof ${ baseVariableName }!=='undefined'?${ safeVariablePath }:null)`;
+
+  return safeVariableLookup;
+};
+
+/**
  * Defines all recognized template syntax elements and their transformation rules.
- * Each entry includes a RegExp to match and a corresponding replacement.
+ * Each entry includes a regular expression to match and a corresponding replacement.
  * These rules are applied to the template to transform custom syntax into valid JS code.
  */
 const elements: Record<string, Element> =
@@ -28,12 +54,13 @@ const elements: Record<string, Element> =
    */
   variable:
   {
-    pattern: /\{\{\s*((?:!|o)?:?)?\s*(\w+(?:\.\w+)*)\s*((?:->\s*(?:(?:\w+(?:\.\w+)*)|(?:"[^"]+"))\s*)*)\s*\}\}/gs,
+    pattern: /(?<!\w+=)\{\{\s*((?:!)?:?)?\s*(\w+(?:\.\w+)*)\s*((?:->\s*(?:(?:\w+(?:\.\w+)*)|(?:"[^"]+"))\s*)*)\s*\}\}/gs,
 
     replacement: (_, ...[scope, variable, fallbacks]) =>
     {
-      const safePath = variable.replaceAll(`.`, `?.`);
-      const scopePrefix = scope?.endsWith(':') ? '' : 'self.';
+      const variablePath = scope?.endsWith(':')
+        ? createLocalVariablePath(variable)
+        : createContextVariablePath(variable);
 
       const useEncoder = !scope?.startsWith('!') && !scope?.startsWith('o');
       const encoderPrefix = useEncoder ? `e(` : '';
@@ -53,18 +80,18 @@ const elements: Record<string, Element> =
           }
           else
           {
-            const fallbackScope = fallbackValue.startsWith(':') ? '' : 'self.';
-            const fallbackVariable = (!fallbackScope.length ? fallbackValue.slice(1) : fallbackValue).replaceAll('.', '?.');
+            const fallbackVariable = fallbackValue.startsWith(':')
+              ? createLocalVariablePath(fallbackValue.slice(1))
+              : createContextVariablePath(fallbackValue);
 
-            defaultValues.push(fallbackScope + fallbackVariable);
+            defaultValues.push(fallbackVariable);
           }
         }
       }
 
       defaultValues.push(`''`);
 
-      return `\${${ encoderPrefix }v(${ scopePrefix }${ safePath }` +
-        `||${ defaultValues.join('||') })${ encoderSuffix }}`;
+      return `\${${ encoderPrefix }s(v(${ variablePath }||${ defaultValues.join('||') }))${ encoderSuffix }}`;
     }
   },
 
@@ -77,16 +104,19 @@ const elements: Record<string, Element> =
 
     replacement: (_, ...[prefix, not, scope, condition]) =>
     {
-      const modifier = not ? '!' : '';
-      const elseIf = prefix === 'else-';
-      const variable = (scope === ':' ? '' : 'self.') + condition.replace('.', '?.');
+      const negationOperator = (not === 'not') ? '!' : '';
+      const conditionalPrefix = (prefix === 'else-') ? '\`}else ' : '${(()=>{';
 
-      return `${ !elseIf ? '${' : '\`||' }${ modifier }r(${ variable })&&\``;
+      const variablePath = (scope === ':')
+        ? createLocalVariablePath(condition)
+        : createContextVariablePath(condition);
+
+      return `${ conditionalPrefix }if(${ negationOperator }r(${ variablePath })){return\``;
     }
   },
 
-  elseBlock: { pattern: /<else>/gs, replacement: `\`||\`` },
-  endCondition: { pattern: /<\/if>/gs, replacement: `\`||''}` },
+  elseBlock: { pattern: /<else>/gs, replacement: `\`}else{return\`` },
+  endCondition: { pattern: /<\/if>/gs, replacement: `\`}})()||''}` },
 
   /**
    * Allows for rendering of components with attributes and children.
@@ -98,26 +128,70 @@ const elements: Record<string, Element> =
     replacement: (_, ...[name, attributes]) =>
     {
       const context: string[] = [];
-      const properties = attributes?.matchAll(/(?<=^|\s)(?:(~?\w+)(?:="(.*?)(?<!\\)")?)/gs);
-      const closed = attributes?.endsWith('/');
+      const properties = attributes?.matchAll(
+        /(?<=^|\s)(~?&?:?)?(\w+(?:\.\w+)*)(?:=((?:\{\{\s*&?:?\s*\w+(?:\.\w+)*\s*\}\})|(?:"(?:.*?)(?<!\\)")))?/gs
+      );
 
       if (properties)
       {
-        for (const property of properties)
+        for (const [, modifiers, attribute, value] of properties)
         {
-          const [name, value] = property.slice(1, 3);
-          const key = name.startsWith('~') ? name.slice(1) : name;
+          if (modifiers?.startsWith('~'))
+          {
+            const key = attribute.includes('.')
+              ? attribute.slice(attribute.lastIndexOf('.') + 1) : attribute;
 
-          const variable = value ?
-            (/^\$\{(?:e\()?v\(/.test(value) ? value.slice(2, -1) : `'${ value }'`) :
-            `(typeof ${ key }!=='undefined'&&v(${ key }))||v(self.${ key.replaceAll('.', '?.') })||undefined`;
+            const safeVariablePath = modifiers.endsWith(':')
+              ? createLocalVariablePath(attribute)
+              : createContextVariablePath(attribute);
 
-          context.push(`${ key }:${ variable }`);
+            context.push(`${ key }:v(${ safeVariablePath })`);
+
+            continue;
+          }
+
+          if (value?.startsWith('"') && value?.endsWith('"'))
+          {
+            context.push(`${ attribute }:\`${ value.slice(1, -1).replaceAll("`", "\\`") }\``);
+
+            continue;
+          }
+
+          if (value?.startsWith('{{') && value?.endsWith('}}'))
+          {
+            let useStringify = true;
+            let useLocalScope = false;
+            let variablePath = value.slice(2, -2).trim();
+
+            if (variablePath.startsWith('&'))
+            {
+              useStringify = false;
+              variablePath = variablePath.slice(1);
+            }
+
+            if (variablePath.startsWith(':'))
+            {
+              useLocalScope = true;
+              variablePath = variablePath.slice(1);
+            }
+
+            const safeVariablePath = useLocalScope
+              ? createLocalVariablePath(variablePath)
+              : createContextVariablePath(variablePath);
+
+            context.push(`${ attribute }:${ useStringify ? `s(v(${ safeVariablePath }))` : `v(${ safeVariablePath })` }`);
+
+            continue;
+          }
+
+          throw new Error(`Invalid attribute value for "${ attribute }": ${ value }`);
         }
       }
 
       context.push(`__children:()=>\``);
-      return `\${__${ name }({${ context.join(',') }${ closed ? '`},self)}' : '' }`;
+      const isSelfClosing = attributes?.endsWith('/');
+
+      return `\${__${ name }({${ context.join(',') }${ isSelfClosing ? '`},self)}' : '' }`;
     }
   },
 
@@ -129,26 +203,25 @@ const elements: Record<string, Element> =
    */
   list:
   {
-    pattern: /<(reverse-)?list\s+(\w+(?:\.\w+)*)\s+as="\s*(\w+)\s*">/gs,
+    pattern: /<(reverse-)?list\s+(:)?(\w+(?:\.\w+)*)\s+as="\s*(\w+(?:\s*,\s*\w+)*)\s*">/gs,
 
-    replacement: (_, ...[prefix, source, variable]) =>
+    replacement: (_, ...[prefix, scope, source, variable]) =>
     {
-      const safeSourcePath = source.replaceAll('.', '?.');
-      const localVariable = safeSourcePath.includes('?.') ? safeSourcePath.slice(0, safeSourcePath.indexOf('?')) : safeSourcePath;
-      const localScope = `typeof ${ localVariable }!=='undefined'&&${ safeSourcePath }`;
-      const reverseFunctionCall = prefix === 'reverse-' ? '.reverse()' : '';
+      const safeSourcePath = scope === ':'
+        ? createLocalVariablePath(source)
+        : createContextVariablePath(source);
 
-      return `\${(()=>{let o='';const l=v(${ localScope }||self.${ safeSourcePath })||[];` +
-        `if(l.length){for(const ${ variable } of l${ reverseFunctionCall }){o+=\``;
+      const useDestructuring = variable.includes(',');
+      const reverseFunctionCall = prefix === 'reverse-' ? '.reverse()' : '';
+      const variableList = useDestructuring ? `{${ variable }}` : variable;
+
+      return `\${(()=>{let o='';const l=v(${ safeSourcePath })||[];` +
+        `for(const ${ variableList } of l${ reverseFunctionCall }){o+=\``;
     }
   },
 
-  listEnd: { pattern: /<\/(?:reverse-)?list>/gs, replacement: `\`}}return o})()}` },
-
-  // `if(true)` ensures we match the open `{` brace count in the list block.
-  // Otherwise, the fallback block would cause a syntax error due to mismatched braces.
-  listFallback: { pattern: /<empty>/g, replacement: `\`}}else{if(true){o=\`` },
-
+  listEnd: { pattern: /<\/(?:reverse-)?list>/gs, replacement: `\`}return o})()}` },
+  listFallback: { pattern: /<empty>/g, replacement: `\`}if(!o.length){o=\`` },
   listFallbackEnd: { pattern: /<\/empty>/gs, replacement: '' },
 
   /**
@@ -267,6 +340,7 @@ const compileDependencies = (dependencies: Dependencies): string =>
 const parseSlots = (template: Template): string =>
 {
   const slots = template.matchAll(/<slot\s+(\w+)>/gs);
+
   return Array.from(slots.map(([, name]) => `'${ name }'`)).join(',');
 };
 
@@ -283,9 +357,10 @@ const compileTemplate = (template: Template,
 {
   const helperFunctions =
     `const v=(t)=>typeof t==='function'?t():t;` +
+    `const c=(a,b)=>typeof a==='number'?a===parseInt(b):a===b;` +
+    `const s=(t)=>typeof t!=='string'&&typeof t!=='null'&&typeof t!=='undefined'?t.toString():t;` +
     `const e=(t)=>typeof t==='string'&&t.replaceAll('<','&lt;').replaceAll('>','&gt;')||t;` +
-    `const r=(t)=>t!==false&&t!==null&&t!==undefined;` +
-    `const c=(a,b)=>typeof a==='number'?a===parseInt(b):a===b;`;
+    `const r=(t)=>(Array.isArray(t)&&t.length)||(t!==false&&t!==null&&t!==undefined);`;
 
   let body = [
     `self=self||{};parent=parent||{};`,

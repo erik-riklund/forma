@@ -30,9 +30,7 @@ describe('variables',
         const template = '<img src="{{ source -> "https://example.com/default.jpg" }}">';
         const renderFunction = compile.toFunction(template);
 
-        expect(renderFunction({ source: 'https://example.com/image.jpg' }))
-          .toBe('<img src="https://example.com/image.jpg">');
-
+        expect(renderFunction({ source: 'https://example.com/image.jpg' })).toBe('<img src="https://example.com/image.jpg">');
         expect(renderFunction({})).toBe('<img src="https://example.com/default.jpg">');
       }
     );
@@ -46,6 +44,16 @@ describe('variables',
         expect(renderFunction({ name: 'John' })).toBe('Hello John!');
         expect(renderFunction({ alias: 'Doe' })).toBe('Hello Doe!');
         expect(renderFunction({})).toBe('Hello friend!');
+      }
+    );
+
+    it('should render the fallback context variable with missing local variable',
+      () =>
+      {
+        const template = 'Hello {{ :name -> alias }}!';
+        const renderFunction = compile.toFunction(template);
+
+        expect(renderFunction({ alias: 'John Doe' })).toBe('Hello John Doe!');
       }
     );
 
@@ -99,7 +107,7 @@ describe('components',
     it('should render a component with an implicit attribute',
       () =>
       {
-        const article = '<list articles as="article"><h1>{{: article.title }}</h1></list>';
+        const article = '<list articles as="article"><h1>{{:article.title}}</h1></list>';
         const template = '<component article ~articles></component>';
         const renderFunction = compile.toFunction(template, { article });
 
@@ -108,10 +116,21 @@ describe('components',
       }
     );
 
+    it('should render a component with an implicit complex attribute',
+      () =>
+      {
+        const user = 'Hello {{name}}!';
+        const template = '<component user ~user.name></component>';
+        const renderFunction = compile.toFunction(template, { user });
+
+        expect(renderFunction({ user: { name: 'John' } })).toBe('Hello John!');
+      }
+    );
+
     it('should render a self-closing component',
       () =>
       {
-        const component = '<h1>Hello {{ name }}</h1>';
+        const component = '<h1>Hello {{name}}</h1>';
         const template = '<component test name="world" />';
         const renderFunction = compile.toFunction(template, { test: component });
 
@@ -122,7 +141,7 @@ describe('components',
     it('should render components with block content',
       () =>
       {
-        const component = '<h1>News</h1>{{@ children}}';
+        const component = '<h1>News</h1>{{@children}}';
         const template = '<component test>Forma is taking shape!</component>';
         const renderFunction = compile.toFunction(template, { test: component });
 
@@ -133,7 +152,7 @@ describe('components',
     it('should render the block content twice',
       () =>
       {
-        const component = '{{@ children }}{{@ children }}';
+        const component = '{{@ children }}{{@children}}';
         const template = '<component test>Forma is taking shape!</component>';
         const renderFunction = compile.toFunction(template, { test: component });
 
@@ -160,7 +179,7 @@ describe('components',
         };
 
         const node = '<h3>{{ label }}</h3><ul><li><list children as="child">' +
-          '<component self label="{{:child.label}}" children="{{o:child.children}}" /></list></li></ul>';
+          '<component self label={{:child.label}} children={{&:child.children}} /></list></li></ul>';
 
         const renderFunction = compile.toFunction(node, undefined, { recursive: true });
         const result = renderFunction({ label: 'Node 1', children: createNodes('1', 2, 3) });
@@ -190,7 +209,7 @@ describe('components',
 
         const tree = '<component node ~label ~children />';
         const node = '<h3>{{ label }}</h3><ul><li><list children as="child">' +
-          '<component self label="{{:child.label}}" children="{{o:child.children}}" /></list></li></ul>';
+          '<component self label={{:child.label}} children={{&:child.children}} /></list></li></ul>';
 
         const nodeComponent = compile.toString(node, undefined, { helpers: false, recursive: true });
         const renderFunction = compile.toFunction(tree, { node: nodeComponent });
@@ -217,15 +236,24 @@ describe('lists',
       }
     );
 
+    it('should render a list with destructured variables',
+      () =>
+      {
+        const context = { users: [{ name: 'John', age: 52 }, { name: 'Jane', age: 35 }] };
+        const template = '<ul><list users as="name,age"><li>{{:name}} ({{:age}})</li></list></ul>';
+        const renderFunction = compile.toFunction(template);
+
+        expect(renderFunction(context)).toBe('<ul><li>John (52)</li><li>Jane (35)</li></ul>');
+      }
+    );
+
     it('should render the fallback content when the list is empty',
       () =>
       {
         const template =
-          '<ul><list users as="user"><li>{{: user.name }}</li>' +
+          '<ul><list users as="user"><li>{{:user.name}}</li>' +
           '<empty><li>No content</li></empty></list></ul>';
         const renderFunction = compile.toFunction(template);
-
-        console.log(compile.toString(template));
 
         expect(renderFunction({ users: [] })).toBe('<ul><li>No content</li></ul>');
       }
@@ -245,8 +273,8 @@ describe('lists',
     it('should render a list passed to a nested component',
       () =>
       {
-        const template = '<component userList users="{{users}}"></component>';
-        const userList = '<ul><list users as="user"><li>{{: user.name }}</li></list></ul>';
+        const template = '<component userList users={{&users}}></component>';
+        const userList = '<ul><list users as="user"><li>{{:user.name}}</li></list></ul>';
         const renderFunction = compile.toFunction(template, { userList });
 
         const context = { users: [{ name: 'John' }, { name: 'Jane' }] };
@@ -257,8 +285,8 @@ describe('lists',
     it('should render a nested component from inside a list',
       () =>
       {
-        const userList = '<li>{{ user.name }}</li>';
-        const template = '<ul><list users as="user"><component userList user="{{: user }}"></component></list></ul>';
+        const userList = '<li>{{user.name}}</li>';
+        const template = '<ul><list users as="user"><component userList user={{&:user}}></component></list></ul>';
         const renderFunction = compile.toFunction(template, { userList });
 
         const context = { users: [{ name: 'John' }, { name: 'Jane' }] };
@@ -270,9 +298,8 @@ describe('lists',
       () =>
       {
         const template =
-          '<ul><list users as="user"><li>{{: user.name }}<ul><list user.pets as="pet">' +
-          '<li>{{: pet.name }}</li></list></ul></li></list></ul>';
-        console.log(compile.toString(template));
+          '<ul><list users as="user"><li>{{:user.name}}<ul><list :user.pets as="pet">' +
+          '<li>{{:pet.name}}</li></list></ul></li></list></ul>';
         const renderFunction = compile.toFunction(template);
 
         const context = {
@@ -392,7 +419,19 @@ describe('conditions',
       }
     );
 
-    it.todo('should render nested conditional blocks',
+    it('should render nested conditional blocks',
+      () =>
+      {
+        const template = '<if condition="test"><if condition="show">Hello</if><else>Goodbye</if> world';
+        const renderFunction = compile.toFunction(template);
+
+        expect(renderFunction({ test: true, show: true })).toBe('Hello world');
+        expect(renderFunction({ test: false, show: false })).toBe('Goodbye world');
+        expect(renderFunction({ test: true, show: false })).toBe(' world');
+      }
+    );
+
+    it.todo('should not render the conditional block when the list is empty',
       () =>
       {
         // ...
