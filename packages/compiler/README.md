@@ -128,7 +128,7 @@ After installing Forma, start by importing the compiler into your project:
 import { compile } from 'forma-compile';
 ```
 
-The `compile` API offers two methods: `toFunction` and `toString`. These methods allow you to transform templates into executable render functions or reusable string representations.
+The `compile` API offers two methods: `toFunction` and `toString`.
 
 ---
 
