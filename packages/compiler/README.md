@@ -2,11 +2,13 @@
 
 # Forma Compile
 
-![Version](https://img.shields.io/npm/v/forma-compile?style=flat-square)
-![Bundle size](https://img.shields.io/badge/bundle-~5kB-green?style=flat-square&labelColor=222&color=44cc88)
-![License](https://img.shields.io/npm/l/forma-compile?style=flat-square)
+![version](https://img.shields.io/badge/version-2.0.0-blue?style=flat-square)
+![bundle size](https://img.shields.io/badge/bundle-~4.5kB-yellowgreen?style=flat-square)
+![tests](https://img.shields.io/badge/tests-45+-orange?style=flat-square)
+![npm downloads](https://img.shields.io/npm/dm/forma-compile?style=flat-square)
+![license](https://img.shields.io/npm/l/forma-compile?style=flat-square)
 
-### One small compiler for devs, one giant leap for markup. 🚀
+### That's one small compiler for a developer, one giant leap for markup-kind. 🚀
 
 Okay okay, maybe not lunar levels of impact — but if you're looking to leave clunky template syntax behind, keep on reading. That’s where Forma comes in. 👋
 
@@ -14,7 +16,7 @@ Okay okay, maybe not lunar levels of impact — but if you're looking to leave c
 
 ## 🔦 Highlights
 
-- 📦 **Tiny** — ~5kB runtime with no dependencies
+- 📦 **Lightweight** — **~4.5kB** runtime with no dependencies
 - 🔒 **Secure by design** — no runtime code evaluation
 - 🧠 **Optimized** — carefully designed to maximize utility without redundancy
 - 🧼 **Isolated** — templates compile into self-contained render functions
@@ -32,37 +34,48 @@ Okay okay, maybe not lunar levels of impact — but if you're looking to leave c
 
 ## 🔧 Versatile applications
 
-Forma's lightweight, server-first design, coupled with its exceptional performance, make it a viable tool for developers across a wide range of projects. These include, but not limited to:
+Forma's lightweight, server-first design, coupled with its exceptional performance, make it a viable tool for developers across a wide range of projects. These include, but are not limited to:
 
-- **Static site generation** 📄<br>
+- **Static site generation**<br>
   Pre-render static HTML for blogs, documentation, or marketing sites, ensuring fast load times and SEO-friendly content. The declarative syntax simplifies the process of creating reusable components, making it easy to maintain and scale your static sites.
 
-- **Dynamic PDF creation** 📑<br>
+- **Dynamic PDF creation**<br>
   Pair Forma with tools like [Puppeteer](https://pptr.dev/) to generate server-rendered PDFs for invoices, reports, or other documents.
 
-- **Email template rendering** 📧<br>
+- **Email template rendering**<br>
   Leverage the secure and predictable syntax to create dynamic, personalized email templates. With built-in safeguards like HTML encoding, you can confidently generate emails that are both visually appealing and free from common security risks.
 
-- **Command-line utilities** 💻<br>
-  The compilers minimal footprint makes it perfect for CLI tools that generate HTML or other text-based outputs. Whether you're building a static site generator, a documentation tool, or a custom report generator, its efficiency ensures fast and reliable results.
+- **Command-line utilities**<br>
+  The compiler's minimal footprint makes it perfect for CLI tools that generate HTML or other text-based outputs. Whether you're building a static site generator, a documentation tool, or a custom report generator, its efficiency ensures fast and reliable results.
 
-- **Server-side rendering for microservices** 🌐<br>
+- **Server-side rendering for microservices**<br>
   Use the compiler to build lightweight, server-rendered components for microservices. Its composable design allows you to create modular templates that can be easily integrated into larger systems.
 
-- **Prototyping and rapid development** 🚀<br>
+- **Prototyping and rapid development**<br>
   The simplicity and ease of use make it an excellent choice for prototyping. Quickly iterate on designs and functionality without the overhead of a full framework, enabling faster feedback and development cycles.
 
 ---
 
-## 🌠 ?
+## 🌠 Designing with declarativity
 
 Forma's syntax is designed with a philosophy of **clarity**, **simplicity**, and **predictability**. By prioritizing a declarative approach, it ensures that templates are easy to read, write, and maintain, even as your projects grow in complexity. Templates describe _what_ the UI should look like, not _how_ to build it. This makes the code more intuitive and easier to reason about.
 
-Templates are composed using a combination of **HTML-like tags** and **variable interpolation** mustaches. The syntax is intentionally minimalistic, focusing on the essentials while providing powerful features for advanced use cases. This balance ensures that it's easy to use while still being able to power complex, scalable applications.
+Templates are composed using a combination of **HTML-like tags** and **variable interpolation** mustaches. The syntax is intentionally minimalistic, focusing on the essentials while providing powerful features for advanced use cases. This balance ensures that it's easy to learn and use while still being able to power complex, scalable applications.
 
-Here is an example that showcase a basic template:
+Here is an example that showcases a basic template:
 
 ```html
+<!-- The "layout" component, which would most likely
+     contain more than this in real life. -->
+
+<slot header />
+
+{{@ children }}
+```
+
+```html
+<!-- The main template, which uses the "layout" component: -->
+
 <component layout>
   <render slot="header">
     <h1>Welcome to Forma, {{ user.name }}!</h1>
@@ -94,7 +107,7 @@ The compiler supports more advanced features as well, such as fallback values fo
     <list news as="title, date, icon, author, body">
       <li>
         <h2>{{: title }}</h2>
-        <if condition=":icon">
+        <if condition={{: icon }}>
           <div><img src="/images/icons/{{: icon }}"></div>
         </if>
         <p>{{: date }} by {{: author }}</p>
@@ -156,7 +169,7 @@ const compiledFunction = compile.toString(template);
 console.log(compiledFunction); // Output: A string representation of the render function
 ```
 
-The stringified function can be saved to a file for later use, enabling efficient caching and reuse across multiple rendering contexts. Additionally, it can be provided as a precompiled dependency to other components, which is required to use [recursive components](#🔄-recursive-components).
+The stringified function can be saved to a file for later use, enabling efficient caching and reuse across multiple rendering contexts. Additionally, it can be provided as a precompiled dependency to other components, which is required to enable recursive rendering.
 
 > ℹ️ Precompiling components reduces runtime overhead and ensures consistent performance, especially in large-scale or complex projects.
 
@@ -195,8 +208,7 @@ or an object with provided properties for nested components. -->
 
 Hello {{ name }}
 ```
-
-To enhance flexibility, the `:` modifier can be used to access variables from the current local scope, in scenarios such as iterating over lists. For example, within a `<list>` block, the `:` modifier ensures that each item in the list is scoped correctly, avoiding conflicts with the components properties.
+The `:` modifier lets you access variables from a local scope, such as when iterating over a list, ensuring that each item is referenced correctly to avoid conflicts with the components properties.
 
 ```html
 <!--
@@ -225,7 +237,23 @@ Hello {{ user.profile.name -> user.name -> "Guest" }}
 
 ---
 
-## 🔒 Secure by design
+### 🛠️ Function values
+
+Dynamic function values are supported, allowing you to compute values at runtime. When a variable in the data context is a function, it will be executed during rendering, and its return value will be used in the output.
+
+```js
+const template = 'Hello {{ user }}';
+const context = { user: { name: () => 'John' } };
+const renderFunction = compile.toFunction(template);
+
+console.log(renderFunction(context)); // Output: "Hello John"
+```
+
+> ⚠️ The stored function is executed every time it is accessed. Ensure it is pure and free of side effects unless such behavior is explicitly required.
+
+---
+
+### 🔒 Secure by design
 
 Variables are **HTML-encoded** for safety. This ensures that any potentially malicious content, such as `<script>` tags or other HTML elements, is rendered as plain text rather than being executed in the browser. This is a critical security measure to prevent [Cross-Site Scripting (XSS) attacks](https://owasp.org/www-community/attacks/xss/), where attackers inject malicious scripts into web pages viewed by other users.
 
@@ -298,7 +326,7 @@ Property values are stringified by default, but you can override this behavior u
 ```html
 <!-- implicit attribute name -->
 
-<component userList ~&users />
+<component userList ~& users />
 ```
 
 > ℹ️ *You can combine `&` and `:` as long as the ampersand comes first.*
@@ -392,7 +420,7 @@ You can nest `<list>` or `<reverse-list>` tags to iterate over nested arrays. Ea
 </list>
 ```
 
-Empty arrays can be handled using the `<empty>` tag within a `<list>` or `<reverse-list>` block:
+You can handle empty arrays by using the `<empty>` tag inside a `<list>` or `<reverse-list>` block:
 
 ```html
 <list users as="user">
@@ -407,7 +435,14 @@ Empty arrays can be handled using the `<empty>` tag within a `<list>` or `<rever
 
 ### Destructuring variables
 
-?
+When rendering lists, each item is often an object containing multiple properties. To improve readability and reduce repetition, you can destructure object properties directly within the `as` attribute.
+
+```html
+<list users as="name, email, alias">
+  <p>{{: name }} ({{: alias }})</p>
+  <p>{{: email }}</p>
+</list>
+```
 
 ---
 
@@ -415,28 +450,28 @@ Empty arrays can be handled using the `<empty>` tag within a `<list>` or `<rever
 
 Inline control flow can be achieved with `<if>`, `<else-if>`, and `<else>` tags. These tags enable you to conditionally render content based on dynamic values. These tags provide a clean and declarative way to handle conditional logic directly within your components.
 
-The `<if>` tag evaluates a variable and renders its content if the value is truthy:
+The `<if>` tag evaluates a variable and renders its content if the value is **truthy**:
 
 ```html
 <!-- Checks if `self.loggedIn` is truthy -->
 
-<if condition="loggedIn">Welcome back!</if>
+<if condition={{ loggedIn }}>Welcome back!</if>
 ```
 
 To handle the opposite case, you can use the `not` modifier:
 
 ```html
-<!-- Checks if the local variable `loggedIn` is truthy -->
+<!-- Checks if the local variable `loggedIn` is falsy -->
 
-<if not condition=":loggedIn">Please log in.</if>
+<if not condition={{: loggedIn }}>Please log in.</if>
 ```
 
 For more complex scenarios, you can chain conditions using `<else-if>` and `<else>` tags. This allows you to handle multiple cases in a structured and readable manner:
 
 ```html
-<if condition="a">
+<if condition={{ alpha }}>
   A is true
-<else-if condition="b">
+<else-if condition={{ beta }}>
   B is true
 <else>
   Neither is true...
@@ -448,10 +483,10 @@ For more complex scenarios, you can chain conditions using `<else-if>` and `<els
 You can nest `<if>` blocks to handle more intricate logic. Each nested block evaluates its condition independently, allowing for highly customizable rendering:
 
 ```html
-<if condition="user">
+<if condition={{ user }}>
   <p>Welcome, {{ user.name }}!</p>
   
-  <if condition="user.isAdmin">
+  <if condition={{ user.isAdmin }}>
     <p>You have admin privileges.</p>
   </if>
 <else>
@@ -468,7 +503,7 @@ Switch-like conditional rendering evaluates a value against multiple cases, much
 The `<when>` tag is used to define the variable being evaluated, while `<case>` tags specify the conditions to match. A `<default>` tag can be included to handle cases where no match is found.
 
 ```html
-<when variable="status">
+<when status>
   <case is="loading">Loading...</case>
   <case is="error">Something went wrong.</case>
   <default>Unknown status</default>
@@ -478,16 +513,20 @@ The `<when>` tag is used to define the variable being evaluated, while `<case>` 
 Switch-like rendering can be nested to handle more complex scenarios. Each nested `<when>` block evaluates its variable independently, allowing for highly customizable rendering.
 
 ```html
-<when variable="user.role">
+<when user.role>
   <case is="admin">
-    <p>Welcome, Admin!</p>
+    <p>Welcome, admin!</p>
 
-    <when variable="user.level">
-      <case is="1">You have basic admin privileges.</case>
-      <case is="2">You have advanced admin privileges.</case>
+    <when user.level>
+      <case is="1">
+        You have basic admin privileges.
+      </case>
+      <case is="2">
+        You have advanced admin privileges!
+      </case>
     </when>
   </case>
-  <case is="user">Welcome, User!</case>
+  <case is="user">Welcome, user!</case>
   <default>Please log in.</default>
 </when>
 ```
@@ -495,9 +534,13 @@ Switch-like rendering can be nested to handle more complex scenarios. Each neste
 The `<default>` tag is optional but recommended to handle cases where no `<case>` matches. If omitted, no content will be rendered for unmatched cases.
 
 ```html
-<when variable="status">
-  <case is="success">Operation successful!</case>
-  <case is="error">Operation failed.</case>
+<when status>
+  <case is="success">
+    Operation successful!
+  </case>
+  <case is="error">
+    Operation failed.
+  </case>
   
   <!-- No default case -->
 </when>
@@ -511,7 +554,7 @@ The `<default>` tag is optional but recommended to handle cases where no `<case>
 
 > ⚠️ Recursive components should be used with caution to avoid infinite loops.
 
-There is support for recursive components, which enables a template to call itself — useful for trees or nested structures. This feature is particularly beneficial when working with hierarchical data, such as file systems, organizational charts, or nested menus. Recursive components allow you to define a single template that can handle any level of nesting, simplifying your code and improving maintainability.
+There is support for recursive components, which enables a template to call itself — useful for trees or nested structures. This feature is particularly beneficial when working with hierarchical data — for example, file systems, organizational charts, or nested menus. Recursive components allow you to define a single template that can handle any level of nesting, simplifying your code and improving maintainability.
 
 To use recursive components, ensure that the `recursive` flag is set to `true` during compilation. This flag enables the compiler to handle self-references within the template, ensuring that the component can call itself without causing errors.
 

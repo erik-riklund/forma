@@ -12,10 +12,8 @@ import type {
  * @param variable - The variable to be transformed.
  * @returns The transformed variable path.
  */
-const createContextVariablePath = (variable: string): string =>
-{
-  return `self.${ variable.replaceAll('.', '?.') }`;
-};
+const createContextVariablePath = (
+  variable: string): string => `self.${ variable.replaceAll('.', '?.') }`;
 
 /**
  * ?
@@ -25,11 +23,10 @@ const createContextVariablePath = (variable: string): string =>
  */
 const createLocalVariablePath = (variable: string): string =>
 {
-  const safeVariablePath = variable.replaceAll('.', '?.');
-  const baseVariableName = variable.includes('.') ? variable.slice(0, variable.indexOf('.')) : variable;
-  const safeVariableLookup = `(typeof ${ baseVariableName }!=='undefined'?${ safeVariablePath }:null)`;
+  const dotIndex = variable.indexOf('.');
+  const baseVariableName = dotIndex !== -1 ? variable.slice(0, dotIndex) : variable;
 
-  return safeVariableLookup;
+  return `(typeof ${ baseVariableName }!=='undefined'?${ variable.replaceAll('.', '?.') }:null)`;
 };
 
 /**
@@ -49,49 +46,48 @@ const elements: Record<string, Element> =
   },
 
   /**
-   * Handles variable interpolation and fallback values,
-   * with support for modifiers like raw output (!) and local scope (:).
+   * Handles variable interpolation and fallback values.
+   * 
+   * Supported modifiers:
+   * - `!` - raw output, no HTML encoding
+   * - `&` - pass by reference, no stringify
+   * - `:` - local scope variable access
    */
   variable:
   {
-    pattern: /(?<!\w+=)\{\{\s*((?:!)?:?)?\s*(\w+(?:\.\w+)*)\s*((?:->\s*(?:(?:\w+(?:\.\w+)*)|(?:"[^"]+"))\s*)*)\s*\}\}/gs,
+    pattern: /(?<!\w+=)\{\{([^}]+)\}\}/gs,
 
-    replacement: (_, ...[scope, variable, fallbacks]) =>
+    replacement: (_, ...[declarations]) =>
     {
-      const variablePath = scope?.endsWith(':')
-        ? createLocalVariablePath(variable)
-        : createContextVariablePath(variable);
+      const values: string[] = [];
+      const variables = declarations.trim().matchAll(
+        /(?<=^|(?:->\s*))((?:!)?:?)?\s*((?:\w+(?:\.\w+)*)|(?:"[^"]+"))(?=(?:\s*->)|$|\s*\})/g
+      );
 
-      const useEncoder = !scope?.startsWith('!') && !scope?.startsWith('o');
-      const encoderPrefix = useEncoder ? `e(` : '';
-      const encoderSuffix = useEncoder ? ')' : '';
-
-      const defaultValues: string[] = [];
-
-      if (fallbacks.length)
+      for (const [_, modifiers, variable] of variables)
       {
-        const fallbackValues = fallbacks.split('->').map(x => x.trim()).filter(Boolean);
-
-        for (const fallbackValue of fallbackValues)
+        if (variable.startsWith('"') && variable.endsWith('"'))
         {
-          if (fallbackValue.startsWith('"') && fallbackValue.endsWith('"'))
-          {
-            defaultValues.push(`'${ fallbackValue.slice(1, -1).replaceAll("'", "\\'") }'`);
-          }
-          else
-          {
-            const fallbackVariable = fallbackValue.startsWith(':')
-              ? createLocalVariablePath(fallbackValue.slice(1))
-              : createContextVariablePath(fallbackValue);
+          values.push(`\`${ variable.slice(1, -1).replaceAll("`", "\\`") }\``);
 
-            defaultValues.push(fallbackVariable);
-          }
+          continue; // string literal
         }
+
+        const useEncoder = modifiers === undefined ||
+          (!modifiers?.startsWith('!') && !modifiers?.startsWith('&'));
+        const useStringify = modifiers === undefined || !modifiers?.includes('&');
+        const useLocalScope = modifiers !== undefined && modifiers.endsWith(':');
+
+        const value = useLocalScope
+          ? createLocalVariablePath(variable)
+          : createContextVariablePath(variable);
+
+        values.push(
+          useStringify ? `${ useEncoder ? 'e(' : '' }s(v(${ value }))${ useEncoder ? ')' : '' }` : `v(${ value })`
+        );
       }
 
-      defaultValues.push(`''`);
-
-      return `\${${ encoderPrefix }s(v(${ variablePath }||${ defaultValues.join('||') }))${ encoderSuffix }}`;
+      return `\${${ values.join('||') }||''}`;
     }
   },
 
@@ -100,7 +96,7 @@ const elements: Record<string, Element> =
    */
   condition:
   {
-    pattern: /<(else-)?if\s+(?:(not)\s+)?condition="\s*(:)?\s*(\w+)\s*">/gs,
+    pattern: /<(else-)?if\s+(?:(not)\s+)?condition=\{\{\s*(:)?\s*(\w+)\s*\}\}>/gs,
 
     replacement: (_, ...[prefix, not, scope, condition]) =>
     {
@@ -129,7 +125,7 @@ const elements: Record<string, Element> =
     {
       const context: string[] = [];
       const properties = attributes?.matchAll(
-        /(?<=^|\s)(~?&?:?)?(\w+(?:\.\w+)*)(?:=((?:\{\{\s*&?:?\s*\w+(?:\.\w+)*\s*\}\})|(?:"(?:.*?)(?<!\\)")))?/gs
+        /(?<=^|\s)(~?&?:?)?\s*(\w+(?:\.\w+)*)(?:=((?:\{\{\s*&?:?\s*\w+(?:\.\w+)*\s*\}\})|(?:"(?:.*?)(?<!\\)")))?/gs
       );
 
       if (properties)
@@ -253,7 +249,7 @@ const elements: Record<string, Element> =
    */
   when:
   {
-    pattern: /<when\s+variable="\s*(:)?\s*(\w+(?:\.\w+)*)\s*">/gs,
+    pattern: /<when\s+value\-of=\{\{\s*(:)?\s*(\w+(?:\.\w+)*)\s*\}\}\s*>/gs,
 
     replacement: (_, ...[scope, variable]) =>
     {
@@ -332,19 +328,6 @@ const compileDependencies = (dependencies: Dependencies): string =>
 };
 
 /**
- * Extracts named slots from a template for pre-processing.
- * 
- * @param template - The template string to be parsed.
- * @returns A string containing the names of the slots found in the template.
- */
-const parseSlots = (template: Template): string =>
-{
-  const slots = template.matchAll(/<slot\s+(\w+)>/gs);
-
-  return Array.from(slots.map(([, name]) => `'${ name }'`)).join(',');
-};
-
-/**
  * Compiles the full template body as a stringified render function.
  * 
  * @param template - The template string to be compiled.
@@ -358,13 +341,12 @@ const compileTemplate = (template: Template,
   const helperFunctions =
     `const v=(t)=>typeof t==='function'?t():t;` +
     `const c=(a,b)=>typeof a==='number'?a===parseInt(b):a===b;` +
-    `const s=(t)=>typeof t!=='string'&&typeof t!=='null'&&typeof t!=='undefined'?t.toString():t;` +
+    `const s=(t)=>typeof t!=='string'?t?.toString():t;` +
     `const e=(t)=>typeof t==='string'&&t.replaceAll('<','&lt;').replaceAll('>','&gt;')||t;` +
-    `const r=(t)=>(Array.isArray(t)&&t.length)||(t!==false&&t!==null&&t!==undefined);`;
+    `const r=(t)=>Array.isArray(t)?t.length>0:(t!==false&&t!==null&&t!==undefined);`;
 
   let body = [
     `self=self||{};parent=parent||{};`,
-    `self.__slots=[${ parseSlots(template) }];`,
     helpers !== false ? helperFunctions : '',
     compileDependencies(dependencies),
     `if(self.__children){self.__children_r=self.__children()}`,

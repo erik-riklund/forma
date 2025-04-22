@@ -25,15 +25,13 @@ it('should throw an error on invalid dependencies',
   }
 );
 
-it.todo('should return a string that contains the template',
+it('should return a string that contains the template',
   () =>
   {
     const template = compile.toString('Hello world');
+    
     const result =
-      '(self,parent)=>{self=self||{};parent=parent||{};self.__slots=[];const v=(t)=>typeof t===' +
-      '\'function\'?t():t;const e=(t)=>typeof t===\'string\'&&t.replaceAll(\'<\',\'&lt;\').replaceAll' +
-      '(\'>\',\'&gt;\')||t;const r=(t)=>t!==false&&t!==null&&t!==undefined;const c=(a,b)=>typeof a===' +
-      '\'number\'?a===parseInt(b):a===b;if(self.__children){self.__children_r=self.__children()}return `Hello world`;}';
+      '(self,parent)=>{self=self||{};parent=parent||{};const v=(t)=>typeof t===\'function\'?t():t;const c=(a,b)=>typeof a===\'number\'?a===parseInt(b):a===b;const s=(t)=>typeof t!==\'string\'?t?.toString():t;const e=(t)=>typeof t===\'string\'&&t.replaceAll(\'<\',\'&lt;\').replaceAll(\'>\',\'&gt;\')||t;const r=(t)=>Array.isArray(t)?t.length>0:(t!==false&&t!==null&&t!==undefined);if(self.__children){self.__children_r=self.__children()}return `Hello world`;}';
 
     expect(template).toEqual(result);
   }
