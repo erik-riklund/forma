@@ -7,8 +7,31 @@ import type {
 } from 'types';
 
 /**
+ * ?
+ * 
+ * @param variable - The variable to be transformed.
+ * @returns The transformed variable path.
+ */
+const createContextVariablePath = (
+  variable: string): string => `self.${ variable.replaceAll('.', '?.') }`;
+
+/**
+ * ?
+ * 
+ * @param variable - The variable path to be transformed.
+ * @returns The transformed variable path.
+ */
+const createLocalVariablePath = (variable: string): string =>
+{
+  const dotIndex = variable.indexOf('.');
+  const baseVariableName = dotIndex !== -1 ? variable.slice(0, dotIndex) : variable;
+
+  return `(typeof ${ baseVariableName }!=='undefined'?${ variable.replaceAll('.', '?.') }:null)`;
+};
+
+/**
  * Defines all recognized template syntax elements and their transformation rules.
- * Each entry includes a RegExp to match and a corresponding replacement.
+ * Each entry includes a regular expression to match and a corresponding replacement.
  * These rules are applied to the template to transform custom syntax into valid JS code.
  */
 const elements: Record<string, Element> =
@@ -23,32 +46,48 @@ const elements: Record<string, Element> =
   },
 
   /**
-   * Handles variable interpolation and fallback values,
-   * with support for modifiers like raw output (!) and local scope (:).
+   * Handles variable interpolation and fallback values.
+   * 
+   * Supported modifiers:
+   * - `!` - raw output, no HTML encoding
+   * - `&` - pass by reference, no stringify
+   * - `:` - local scope variable access
    */
   variable:
   {
-    pattern: /(\{\{?)\s*(!?:?)?\s*(\w+(?:\.\w+)*)\s*(?:->\s*([^\}]+)\s*)?\}?\}/gs,
+    pattern: /(?<!\w+=)\{\{([^}]+)\}\}/gs,
 
-    replacement: (_, ...[braces, scope, name, value]) =>
+    replacement: (_, ...[declarations]) =>
     {
-      const path = name.replaceAll(`.`, `?.`);
-      const prefix = scope?.endsWith(':') ? '' : 'self.';
+      const values: string[] = [];
+      const variables = declarations.trim().matchAll(
+        /(?<=^|(?:->\s*))((?:!)?:?)?\s*((?:\w+(?:\.\w+)*)|(?:"[^"]+"))(?=(?:\s*->)|$|\s*\})/g
+      );
 
-      if (braces === '{{')
+      for (const [_, modifiers, variable] of variables)
       {
-        const useEncoder = !scope?.startsWith('!');
-        const before = useEncoder ? `e(` : '';
-        const after = useEncoder ? ')' : '';
+        if (variable.startsWith('"') && variable.endsWith('"'))
+        {
+          values.push(`\`${ variable.slice(1, -1).replaceAll("`", "\\`") }\``);
 
-        const defaultValue = value?.replaceAll(`'`, `\\'`).trim() || '';
-        return `\${${ before }v(${ prefix }${ path })||'${ defaultValue }'${ after }}`;
+          continue; // string literal
+        }
+
+        const useEncoder = modifiers === undefined ||
+          (!modifiers?.startsWith('!') && !modifiers?.startsWith('&'));
+        const useStringify = modifiers === undefined || !modifiers?.includes('&');
+        const useLocalScope = modifiers !== undefined && modifiers.endsWith(':');
+
+        const value = useLocalScope
+          ? createLocalVariablePath(variable)
+          : createContextVariablePath(variable);
+
+        values.push(
+          useStringify ? `${ useEncoder ? 'e(' : '' }s(v(${ value }))${ useEncoder ? ')' : '' }` : `v(${ value })`
+        );
       }
-      else
-      {
-        const defaultValue = value || null; // non-string values (marked by single braces).
-        return `v(${ prefix }${ path })${ defaultValue ? `||${ defaultValue }` : '' }`;
-      }
+
+      return `\${${ values.join('||') }||''}`;
     }
   },
 
@@ -57,20 +96,23 @@ const elements: Record<string, Element> =
    */
   condition:
   {
-    pattern: /<(else-)?if\s+(?:(not)\s+)?condition="\s*(:)?\s*(\w+)\s*">/gs,
+    pattern: /<(else-)?if\s+(?:(not)\s+)?condition=\{\{\s*(:)?\s*(\w+)\s*\}\}>/gs,
 
     replacement: (_, ...[prefix, not, scope, condition]) =>
     {
-      const modifier = not ? '!' : '';
-      const elseIf = prefix === 'else-';
-      const variable = (scope === ':' ? '' : 'self.') + condition.replace('.', '?.');
+      const negationOperator = (not === 'not') ? '!' : '';
+      const conditionalPrefix = (prefix === 'else-') ? '\`}else ' : '${(()=>{';
 
-      return `${ !elseIf ? '${' : '\`||' }${ modifier }r(${ variable })&&\``;
+      const variablePath = (scope === ':')
+        ? createLocalVariablePath(condition)
+        : createContextVariablePath(condition);
+
+      return `${ conditionalPrefix }if(${ negationOperator }r(${ variablePath })){return\``;
     }
   },
 
-  elseBlock: { pattern: /<else>/gs, replacement: `\`||\`` },
-  endCondition: { pattern: /<\/if>/gs, replacement: `\`||''}` },
+  elseBlock: { pattern: /<else>/gs, replacement: `\`}else{return\`` },
+  endCondition: { pattern: /<\/if>/gs, replacement: `\`}})()||''}` },
 
   /**
    * Allows for rendering of components with attributes and children.
@@ -82,26 +124,70 @@ const elements: Record<string, Element> =
     replacement: (_, ...[name, attributes]) =>
     {
       const context: string[] = [];
-      const properties = attributes?.matchAll(/(?<=^|\s)(?:(~?\w+)(?:="([^"]+)")?)/gs);
-      const closed = attributes?.endsWith('/');
+      const properties = attributes?.matchAll(
+        /(?<=^|\s)(~?&?:?)?\s*(\w+(?:\.\w+)*)(?:=((?:\{\{\s*&?:?\s*\w+(?:\.\w+)*\s*\}\})|(?:"(?:.*?)(?<!\\)")))?/gs
+      );
 
       if (properties)
       {
-        for (const property of properties)
+        for (const [, modifiers, attribute, value] of properties)
         {
-          const [name, value] = property.slice(1, 3);
-          const key = name.startsWith('~') ? name.slice(1) : name;
+          if (modifiers?.startsWith('~'))
+          {
+            const key = attribute.includes('.')
+              ? attribute.slice(attribute.lastIndexOf('.') + 1) : attribute;
 
-          const variable = value ?
-            (/^v\(\w+(?:\??\.\w+)*\)$/s.test(value) ? value : `'${ value }'`) :
-            `(typeof ${ key }!=='undefined'&&v(${ key }))||v(self.${ key.replaceAll('.', '?.') })||undefined`;
+            const safeVariablePath = modifiers.endsWith(':')
+              ? createLocalVariablePath(attribute)
+              : createContextVariablePath(attribute);
 
-          context.push(`${ key }:${ variable }`);
+            context.push(`${ key }:v(${ safeVariablePath })`);
+
+            continue;
+          }
+
+          if (value?.startsWith('"') && value?.endsWith('"'))
+          {
+            context.push(`${ attribute }:\`${ value.slice(1, -1).replaceAll("`", "\\`") }\``);
+
+            continue;
+          }
+
+          if (value?.startsWith('{{') && value?.endsWith('}}'))
+          {
+            let useStringify = true;
+            let useLocalScope = false;
+            let variablePath = value.slice(2, -2).trim();
+
+            if (variablePath.startsWith('&'))
+            {
+              useStringify = false;
+              variablePath = variablePath.slice(1);
+            }
+
+            if (variablePath.startsWith(':'))
+            {
+              useLocalScope = true;
+              variablePath = variablePath.slice(1);
+            }
+
+            const safeVariablePath = useLocalScope
+              ? createLocalVariablePath(variablePath)
+              : createContextVariablePath(variablePath);
+
+            context.push(`${ attribute }:${ useStringify ? `s(v(${ safeVariablePath }))` : `v(${ safeVariablePath })` }`);
+
+            continue;
+          }
+
+          throw new Error(`Invalid attribute value for "${ attribute }": ${ value }`);
         }
       }
 
       context.push(`__children:()=>\``);
-      return `\${__${ name }({${ context.join(',') }${ closed ? '`},self)}' : '' }`;
+      const isSelfClosing = attributes?.endsWith('/');
+
+      return `\${__${ name }({${ context.join(',') }${ isSelfClosing ? '`},self)}' : '' }`;
     }
   },
 
@@ -113,22 +199,41 @@ const elements: Record<string, Element> =
    */
   list:
   {
-    pattern: /<(reverse-)?list\s+(\w+)\s+as="\s*(\w+)\s*">/gs,
+    pattern: /<(reverse-)?list\s+(:)?(\w+(?:\.\w+)*)\s+as="\s*(\w+(?:\s*,\s*\w+)*)\s*">/gs,
 
-    replacement: (_, ...[prefix, source, variable]) =>
+    replacement: (_, ...[prefix, scope, source, variable]) =>
     {
-      const reverse = prefix === 'reverse-' ? '.reverse()' : '';
-      return `\${(v(self.${ source })||null)?${ reverse }.map(${ variable }=>\``;
+      const safeSourcePath = scope === ':'
+        ? createLocalVariablePath(source)
+        : createContextVariablePath(source);
+
+      const useDestructuring = variable.includes(',');
+      const reverseFunctionCall = prefix === 'reverse-' ? '.reverse()' : '';
+      const variableList = useDestructuring ? `{${ variable }}` : variable;
+
+      return `\${(()=>{let o='';const l=v(${ safeSourcePath })||[];` +
+        `for(const ${ variableList } of l${ reverseFunctionCall }){o+=\``;
     }
   },
 
-  listEnd: { pattern: /<\/(?:reverse-)?list>/gs, replacement: `\`).join('')}` },
+  listEnd: { pattern: /<\/(?:reverse-)?list>/gs, replacement: `\`}return o})()}` },
+  listFallback: { pattern: /<empty>/g, replacement: `\`}if(!o.length){o=\`` },
+  listFallbackEnd: { pattern: /<\/empty>/gs, replacement: '' },
 
   /**
    * Named slot definition (`<slot name>`).
    * This allows for defining reusable content areas within components.
    */
-  slot: { pattern: /<slot\s+(\w+)>/gs, replacement: `\${v(parent.__slot_$1)||\`` },
+  slot: {
+    pattern: /<slot\s+(\w+)(\s*\/)?>/gs,
+    replacement: (_, ...[name, suffix]) =>
+    {
+      const closed = suffix?.endsWith('/');
+
+      return `\${v(parent.__slot_${ name })||\`${ closed ? '`}' : '' }`;
+    }
+  },
+
   slotEnd: { pattern: /<\/slot>/gs, replacement: '`}' },
 
   /**
@@ -144,7 +249,7 @@ const elements: Record<string, Element> =
    */
   when:
   {
-    pattern: /<when\s+variable="\s*(:)?\s*(\w+(?:\.\w+)*)\s*">/gs,
+    pattern: /<when\s+value\-of=\{\{\s*(:)?\s*(\w+(?:\.\w+)*)\s*\}\}\s*>/gs,
 
     replacement: (_, ...[scope, variable]) =>
     {
@@ -216,22 +321,10 @@ const compileDependencies = (dependencies: Dependencies): string =>
 
       return template.startsWith('(self,parent)=>{')
         ? `const __${ name }=${ template };` // precompiled template.
-        : `const __${ name }=${ compile.toString(template) };`;
+        : `const __${ name }=${ compile.toString(template, undefined, { helpers: false }) };`;
     }
   );
   return result.join('');
-};
-
-/**
- * Extracts named slots from a template for pre-processing.
- * 
- * @param template - The template string to be parsed.
- * @returns A string containing the names of the slots found in the template.
- */
-const parseSlots = (template: Template): string =>
-{
-  const slots = template.matchAll(/<slot\s+(\w+)>/gs);
-  return Array.from(slots.map(([, name]) => `'${ name }'`)).join(',');
 };
 
 /**
@@ -239,23 +332,28 @@ const parseSlots = (template: Template): string =>
  * 
  * @param template - The template string to be compiled.
  * @param dependencies - An object containing dependencies to be compiled.
+ * @param helpers - ?
  * @returns A string containing the compiled template body.
  */
-const compileTemplate = (
-  template: Template, dependencies: Dependencies = {}): string =>
+const compileTemplate = (template: Template,
+  dependencies: Dependencies = {}, helpers: boolean = true): string =>
 {
-  let body =
-    `self=self||{};parent=parent||{};` +
-    `self.__slots=[${ parseSlots(template) }];` +
+  const helperFunctions =
     `const v=(t)=>typeof t==='function'?t():t;` +
-    `const e=(t)=>typeof t==='string'&&t.replaceAll('<','&lt;').replaceAll('>','&gt;')||t;` +
-    `const r=(t)=>t!==false&&t!==null&&t!==undefined;` +
     `const c=(a,b)=>typeof a==='number'?a===parseInt(b):a===b;` +
-    compileDependencies(dependencies) +
-    `if(self.__children){self.__children_r=self.__children()}` +
-    `return \`${ parseElements(template) }\`;`;
+    `const s=(t)=>typeof t!=='string'?t?.toString():t;` +
+    `const e=(t)=>typeof t==='string'&&t.replaceAll('<','&lt;').replaceAll('>','&gt;')||t;` +
+    `const r=(t)=>Array.isArray(t)?t.length>0:(t!==false&&t!==null&&t!==undefined);`;
 
-  return body;
+  let body = [
+    `self=self||{};parent=parent||{};`,
+    helpers !== false ? helperFunctions : '',
+    compileDependencies(dependencies),
+    `if(self.__children){self.__children_r=self.__children()}`,
+    `return \`${ parseElements(template) }\`;`
+  ];
+
+  return body.join('');
 };
 
 /**
@@ -274,14 +372,14 @@ export const compile =
    */
   toFunction: (
     template: Template, dependencies: Dependencies = {},
-    { recursive }: Options = {}): RenderFunction =>
+    { helpers, recursive }: Options = {}): RenderFunction =>
   {
     if (recursive === true)
     {
       dependencies.self = template;
     }
 
-    const body = compileTemplate(template, dependencies);
+    const body = compileTemplate(template, dependencies, helpers);
     return new Function('self', 'parent', body) as RenderFunction;
   },
 
@@ -295,13 +393,13 @@ export const compile =
    */
   toString: (
     template: Template, dependencies: Dependencies = {},
-    { recursive }: Options = {}): string =>
+    { helpers, recursive }: Options = {}): string =>
   {
     if (recursive === true)
     {
       dependencies.self = template;
     }
 
-    return `(self,parent)=>{${ compileTemplate(template, dependencies) }}`;
+    return `(self,parent)=>{${ compileTemplate(template, dependencies, helpers) }}`;
   }
 };

@@ -2,19 +2,21 @@
 
 # Forma Compile
 
-![Version](https://img.shields.io/npm/v/forma-compile?style=flat-square)
-![Bundle size](https://img.shields.io/badge/bundle-~3.5kB-green?style=flat-square&labelColor=222&color=44cc88)
-![License](https://img.shields.io/npm/l/forma-compile?style=flat-square)
+![version](https://img.shields.io/badge/version-2.0.0-blue?style=flat-square)
+![bundle size](https://img.shields.io/badge/bundle-~4.5kB-yellowgreen?style=flat-square)
+![tests](https://img.shields.io/badge/tests-45+-orange?style=flat-square)
+![npm downloads](https://img.shields.io/npm/dm/forma-compile?style=flat-square)
+![license](https://img.shields.io/npm/l/forma-compile?style=flat-square)
 
-### Tiny compiler. Maximum power. ⚡
+### That's one small compiler for a developer, one giant leap for markup-kind. 🚀
 
-Looking for an alternative to JSX, Handlebars, or EJS that is **declarative**, **fast**, **composable**, and features a **simple syntax**? Forma is built for you.
+Okay okay, maybe not lunar levels of impact — but if you're looking to leave clunky template syntax behind, keep on reading. That’s where Forma comes in. 👋
 
 ---
 
 ## 🔦 Highlights
 
-- 📦 **Tiny** — ~3.5kB runtime with no dependencies
+- 📦 **Lightweight** — **~4.5kB** runtime with no dependencies
 - 🔒 **Secure by design** — no runtime code evaluation
 - 🧠 **Optimized** — carefully designed to maximize utility without redundancy
 - 🧼 **Isolated** — templates compile into self-contained render functions
@@ -24,48 +26,106 @@ Looking for an alternative to JSX, Handlebars, or EJS that is **declarative**, *
 
 ---
 
-**Forma** is a declarative, component-based template compiler designed to streamline server-side rendering. With its clean and minimal syntax, Forma transforms templates into secure, self-contained render functions, enabling the creation of fast, lightweight, and scalable applications.
+**Forma** is a declarative, component-based template compiler with a focus on server-side rendering. Using a clean and readable syntax, templates are transformed into secure, self-contained render functions, enabling the creation of fast, maintainable, and scalable applications.
 
-The compiler delivers a robust feature set with a minimal footprint, making it an excellent fit for modern server-rendered web development. Its focus on server-side rendering ensures simplicity and performance, making it ideal for scenarios where client-side interactivity isn’t required.
-
-> Use complementary tools like [Alpine.js](https://alpinejs.dev/) to layer in lightweight, declarative interactivity while Forma handles secure, server-rendered HTML. This pairing enhances your UI where needed, without adding runtime complexity or compromising security.
+> ℹ️ Use complementary tools like [Alpine.js](https://alpinejs.dev/) to layer in lightweight, declarative interactivity. This enhances your UI where needed, without adding runtime complexity or compromising security.
 
 ---
 
-### 🔧 Versatile by design
+## 🔧 Versatile applications
 
-Forma is fast, expressive, and designed with server-first rendering in mind — but its simplicity makes it just as powerful in tooling and automation. Whether you're building websites, PDFs, emails, or CLI utilities, Forma keeps your output clean, fast, and safe by default.
+Forma's lightweight, server-first design, coupled with its exceptional performance, make it a viable tool for developers across a wide range of projects. These include, but are not limited to:
 
-- **Static site generation** 📄<br>
-  Forma can be used to pre-render static HTML pages for blogs, documentation sites, or marketing pages, ensuring fast load times and SEO optimization.
-- **PDF generation** 📑<br>
-  Combine Forma with libraries like [Puppeteer](https://pptr.dev/) to create dynamic, server-rendered PDFs for invoices, reports, or other documents.
-- **Email template rendering** 📧<br>
-  Its secure and predictable syntax makes it a great choice for generating dynamic email templates with personalized content.
-- **Command-line tools** 💻<br>
-  Forma's lightweight nature makes it suitable for building CLI tools that generate HTML or other text-based outputs.
+- **Static site generation**<br>
+  Pre-render static HTML for blogs, documentation, or marketing sites, ensuring fast load times and SEO-friendly content. The declarative syntax simplifies the process of creating reusable components, making it easy to maintain and scale your static sites.
+
+- **Dynamic PDF creation**<br>
+  Pair Forma with tools like [Puppeteer](https://pptr.dev/) to generate server-rendered PDFs for invoices, reports, or other documents.
+
+- **Email template rendering**<br>
+  Leverage the secure and predictable syntax to create dynamic, personalized email templates. With built-in safeguards like HTML encoding, you can confidently generate emails that are both visually appealing and free from common security risks.
+
+- **Command-line utilities**<br>
+  The compiler's minimal footprint makes it perfect for CLI tools that generate HTML or other text-based outputs. Whether you're building a static site generator, a documentation tool, or a custom report generator, its efficiency ensures fast and reliable results.
+
+- **Server-side rendering for microservices**<br>
+  Use the compiler to build lightweight, server-rendered components for microservices. Its composable design allows you to create modular templates that can be easily integrated into larger systems.
+
+- **Prototyping and rapid development**<br>
+  The simplicity and ease of use make it an excellent choice for prototyping. Quickly iterate on designs and functionality without the overhead of a full framework, enabling faster feedback and development cycles.
+
+---
+
+## 🌠 Designing with declarativity
+
+Forma's syntax is designed with a philosophy of **clarity**, **simplicity**, and **predictability**. By prioritizing a declarative approach, it ensures that templates are easy to read, write, and maintain, even as your projects grow in complexity. Templates describe _what_ the UI should look like, not _how_ to build it. This makes the code more intuitive and easier to reason about.
+
+Templates are composed using a combination of **HTML-like tags** and **variable interpolation** mustaches. The syntax is intentionally minimalistic, focusing on the essentials while providing powerful features for advanced use cases. This balance ensures that it's easy to learn and use while still being able to power complex, scalable applications.
+
+Here is an example that showcases a basic template:
+
+```html
+<!-- The "layout" component, which would most likely
+     contain more than this in real life. -->
+
+<slot header />
+
+{{@ children }}
+```
+
+```html
+<!-- The main template, which uses the "layout" component: -->
+
+<component layout>
+  <render slot="header">
+    <h1>Welcome to Forma, {{ user.name }}!</h1>
+    <p>Forma is a declarative, component-based template compiler
+      with a focus on server-side rendering.</p>
+  </render>
+  <ul>
+    <list news as="article">
+      <li>
+        <h2>{{: article.title }}</h2>
+        <p>{{: article.date }} by {{: article.author }}</p>
+        <p>{{: article.body }}</p>
+      </li>
+    </list>
+  </ul>
+</component>
+```
+
+The compiler supports more advanced features as well, such as fallback values for variable interpolation and empty lists, destructuring objects during iteration, conditional rendering, and more. Here's an expanded version of the basic example above:
+
+```html
+<component layout>
+  <render slot="header">
+    <h1>Welcome to Forma, {{ user.name -> "Guest" }}!</h1>
+    <p>Forma is a declarative, component-based template compiler
+      with a focus on server-side rendering.</p>
+  </render>
+  <ul>
+    <list news as="title, date, icon, author, body">
+      <li>
+        <h2>{{: title }}</h2>
+        <if condition={{: icon }}>
+          <div><img src="/images/icons/{{: icon }}"></div>
+        </if>
+        <p>{{: date }} by {{: author }}</p>
+        <p>{{: body }}</p>
+      </li>
+      <empty>
+        <li>No news have been posted yet.</li>
+      </empty>
+    </list>
+  </ul>
+</component>
+```
 
 ---
 
-## ⚡ Performance
-
-*Performance tests will be added continuously to test resilience, speed, and scalability.*
-
-- ✅ Compiled and rendered a simple component **1,000** times in ~**60ms**
-- ✅ Rendered a precompiled component **100,000** times in ~**95ms**
-- ✅ Compiled **1,003** components and executed **3,001** total renders in ~**100ms**
-- ✅ Rendered a list with **100 items** using a precompiled component **1,000** times in ~**50ms**
-- ✅ Compiled and rendered a component with **100 dependencies**, **100** times in ~**400ms**
-- ✅ Rendered a deeply nested recursive component tree with **111,111 nodes** in ~**150ms**
-
-Forma isn’t just fast under pressure — **it’s composed.** 🥁
-
-> ℹ️ All tests were conducted using the [Bun](https://bun.sh/) runtime.
-
----
 ## 📦 Installation
 
-To install Forma Compile, use your preferred `npm`-compatible package manager:
+To install Forma Compile, use your preferred package manager:
 
 ```bash
 npm install forma-compile
@@ -73,19 +133,19 @@ npm install forma-compile
 
 ---
 
-## ⚙️ Using the compiler
+## ⚙️ Compiler API
 
-After installing Forma Compile, you can start using the compiler by importing it into your project:
+After installing Forma, start by importing the compiler into your project:
 
 ```js
 import { compile } from 'forma-compile';
 ```
 
-The `compile` API provides two methods: `toFunction` and `toString`.
+The `compile` API offers two methods: `toFunction` and `toString`.
 
-### `toFunction`
+---
 
-This method compiles a template into an executable render function:
+The `toFunction` method compiles a template into an executable render function. This function can then be used to generate HTML dynamically based on a provided data context.
 
 ```js
 const template = 'Hello {{ name }}!';
@@ -96,9 +156,11 @@ const output = renderFunction({ name: 'World' });
 console.log(output); // Output: Hello World!
 ```
 
-### `toString`
+> ℹ️ This method is ideal for scenarios where you need to render templates on the fly.
 
-Returns a stringified render function that can be evaluated or reused later, such as in build pipelines or caching layers:
+---
+
+The `toString` method compiles a template into a stringified render function. This is particularly useful for build pipelines, caching, or scenarios where you want to store the compiled function for later use — all without relying on `eval`.
 
 ```js
 const template = 'Hello {{ name }}!';
@@ -107,81 +169,105 @@ const compiledFunction = compile.toString(template);
 console.log(compiledFunction); // Output: A string representation of the render function
 ```
 
-### Parameters
+The stringified function can be saved to a file for later use, enabling efficient caching and reuse across multiple rendering contexts. Additionally, it can be provided as a precompiled dependency to other components, which is required to enable recursive rendering.
 
-Both methods share the same parameters:
-
-- **`template: Template`**<br>
-  The template string to be compiled.
-- **`dependencies: Dependencies = {}`**<br>
-  An optional object containing templates that the template relies on.
-- **`{ recursive: boolean }: Options = {}`**<br>
-  An optional configuration object. The `recursive` flag determines whether the compiler should enable the component to call itself.
-
-
-### When to use each method
-
-- **`toFunction`**<br>
-  Use this for immediate execution of templates with a data context.
-- **`toString`**<br>
-  Use this for scenarios where you need to store or transmit the compiled function, such as caching or server-side precompilation.
+> ℹ️ Precompiling components reduces runtime overhead and ensures consistent performance, especially in large-scale or complex projects.
 
 ---
 
-## 📖 Learning the syntax
+### 📋 Parameters
 
-Forma templates use a concise, declarative syntax designed for simplicity, readability and developer experience. The syntax is intentionally minimalistic, allowing you to focus on the structure of your templates without unnecessary complexity.
+Both `toFunction` and `toString` share the same set of parameters:
 
-### Key syntax features
+- **`template: string`**
 
-1. **Declarative** — Forma templates emphasize a declarative approach, where you describe what the UI should look like rather than how to construct it. This makes the templates easier to read and maintain.
+  The template string to be compiled. It defines the structure and dynamic content of your component.
 
-2. **Minimal boilerplate** — With Forma, you can achieve more with less code. The syntax avoids unnecessary verbosity, enabling you to write clean and efficient templates.
+- **`dependencies: Record<string, string> = {}`**
 
-3. **Safe and predictable** — Built-in safeguards like HTML encoding for variables ensure that your templates are secure by default, reducing the risk of common vulnerabilities such as cross-site scripting (XSS).
+  An optional object containing templates that the main template depends on. These dependencies are injected during compilation to ensure that components are self-contained.
 
-4. **Component-centric** — The syntax is optimized for building reusable components, making it easy to create modular and maintainable UIs.
+- **`options: { helpers?: boolean, recursive?: boolean } = {}`**
 
-5. **Flexible modifiers** — Forma provides powerful modifiers like `!` for raw content and `:` for locally scoped variables, giving you fine-grained control over your templates.
-
-6. **Built-in control flow** — With native support for conditionals, loops, and slots, Forma templates can handle complex rendering logic without relying on external libraries or frameworks.
-
-By combining these features, Forma templates strike a balance between simplicity and power, making them an excellent choice for developers looking to build scalable and maintainable server-side rendered applications.
+  An optional configuration object.
+  - The `helpers` flag specifies whether to include helper functions in the compiled output.
+  - The `recursive` flag allows the compiler to enable recursion, making it possible for a component to reference itself during rendering.
 
 ---
 
-### 🧠 Variables
+## 📖 Detailed syntax descriptions
 
-Forma templates support variable interpolation with optional default values. By default, these variables point to the provided data context. You can use the `:` modifier to access variables from the current scope. This is especially useful inside lists or when passing properties between components.
+### 🧠 Rendering dynamic values
+
+Variable interpolation with optional default values allow you to render dynamic values inside your components. By default, these variables reference the components data context, ensuring a seamless connection between your data and the rendered output.
 
 ```html
 <!--
-Compiles to `self.name` (the provided data context)
--->
+Compiles to `self.name`, which is the provided data context for top-level components,
+or an object with provided properties for nested components. -->
+
 Hello {{ name }}
+```
+The `:` modifier lets you access variables from a local scope, such as when iterating over a list, ensuring that each item is referenced correctly to avoid conflicts with the components properties.
 
+```html
 <!--
-Compiles to `self.user?.name` OR "Guest"
--->
-Hello {{ user.name -> Guest }} 
+Refers to a locally scoped variable (e.g., within a list rendering context) -->
 
-<!--
-Compiles to `name` (a local variable, e.g. rendering a list)
--->
 Hello {{: name }}
 ```
 
-Variables are **HTML-encoded** for safety. You can disable this by using the `!` modifier:
+Additionally, you can define fallback values for variables using the `->` operator. This ensures that your components remain robust and functional even when certain data points are missing. The fallback value acts as a default, providing a seamless user experience by preventing errors or blank outputs in your rendered components.
 
 ```html
 <!--
-Compiles to `self.content` (the provided data context)
--->
+Compiles to `self.user?.name || "Guest"` -->
+
+Hello {{ user.name -> "Guest" }}
+```
+
+There is also support for nested fallback values, allowing you to chain multiple defaults for complex data structures. This chaining mechanism ensures that your templates remain concise and expressive, even when dealing with deeply nested or hierarchical data. It eliminates the need for verbose checks and simplifies the process of rendering dynamic content with confidence.
+
+```html
+<!--
+Compiles to `self.user?.profile?.name || self.user?.name || "Guest"` -->
+
+Hello {{ user.profile.name -> user.name -> "Guest" }}
+```
+
+---
+
+### 🛠️ Function values
+
+Dynamic function values are supported, allowing you to compute values at runtime. When a variable in the data context is a function, it will be executed during rendering, and its return value will be used in the output.
+
+```js
+const template = 'Hello {{ user }}';
+const context = { user: { name: () => 'John' } };
+const renderFunction = compile.toFunction(template);
+
+console.log(renderFunction(context)); // Output: "Hello John"
+```
+
+> ⚠️ The stored function is executed every time it is accessed. Ensure it is pure and free of side effects unless such behavior is explicitly required.
+
+---
+
+### 🔒 Secure by design
+
+Variables are **HTML-encoded** for safety. This ensures that any potentially malicious content, such as `<script>` tags or other HTML elements, is rendered as plain text rather than being executed in the browser. This is a critical security measure to prevent [Cross-Site Scripting (XSS) attacks](https://owasp.org/www-community/attacks/xss/), where attackers inject malicious scripts into web pages viewed by other users.
+
+You can override this by using the `!` modifier, which tells the system to render the variable as raw HTML. However, use this feature cautiously as disabling HTML encoding without proper validation can expose your application to security vulnerabilities.
+
+```html
+<!--
+Compiles to `self.content` (the provided data context) -->
+
 {{! content }}
 
 <!--
-Compiles to `content` (a local variable)
--->
+Compiles to `content` (a local variable) -->
+
 {{!: content }}
 ```
 
@@ -189,69 +275,93 @@ Compiles to `content` (a local variable)
 
 ---
 
-### 🧩 Components
+## 🧩 Components
 
-Components are isolated templates that receive **properties** and **block content**:
+Components are modular elements that encapsulate both structure and functionality. They support **properties**, which allow you to pass dynamic data into the component, enabling customization and reusability. Additionally, components can include **block content**, providing a way to define content within the component's structure. This flexibility makes it easy to create complex, hierarchical UIs while maintaining a clean and declarative syntax.
 
 ```html
-<!-- component without block content -->
+<!-- 'button' here refers to the component name, not an HTML tag -->
+
+<!-- without block content -->
 <component button label="Click me"></component>
 
-<!-- self-closing component without block content -->
+<!-- self-closing (no block content) -->
 <component button label="Click me" />
 
-<!-- component with block content -->
+<!-- with block content -->
 <component button>Click me</component>
 ```
 
-#### Implicit property names
+Components are designed to be self-contained, meaning they manage their own scope and do not interfere with other components. This isolation ensures predictable behavior and simplifies debugging. Furthermore, components can leverage [**named slots**](#🔌-named-slots) to define specific areas where custom content can be injected, offering even more control over layout and design.
 
-Forma allows you to define properties implicitly using the `~` prefix. This is useful for scenarios where the property name matches the variable name, reducing redundancy in your templates.
+---
 
-```html
-<component user name="{ name }">Hello world</component>
-```
+### Implicit property names
 
-The above example explicitly sets the `name` property to the value of the `name` variable. With implicit property names, you can simplify this:
+You can define properties implicitly using the `~` prefix. This feature is particularly useful when the property name matches the variable name, as it eliminates the need for repetitive declarations, making your components cleaner and more concise.
 
 ```html
-<component user ~name>Hello world</component>
-```
+<!-- explicit property name -->
+<component user age={{ age }}>Hello world</component>
 
-Here, the `~name` shorthand automatically assigns the value of the `name` variable to the `name` property. This makes your templates cleaner and easier to read, especially when dealing with multiple properties.
+<!-- implicit property name -->
+<component user ~age>Hello world</component>
 
-> If there is both a local variable `name` and a context variable, the local variable takes precedence.
-
-#### Passing dynamic property values
-
-You can pass variable values using `{...}` (single braces), and the `:` modifier can be used for local variables. These variables are **never** HTML-encoded; they are passed as raw values.
-
-```html
-<component card title="{ user.name }"></component>
-```
-
-#### Using properties and rendering block content
-
-Inside the component template, use `{{ label }}` or `{{@ children }}` to reference properties or the provided block content:
-
-```html
-<!-- button component -->
-<button>{{ label }}</button>
-
-<!-- layout component -->
-<header>Header</header>
-<main>{{@ children}}</main>
-<footer>Footer</footer>
+<!-- implicit property name (local scope) -->
+ <component user ~:age>Hello world</component>
 ```
 
 ---
 
-### 🔌 Named slots
+### Passing objects or arrays as property values
 
-You can define **named slot content** using `<render slot="name">` and consume it using `<slot name>` in a component:
+Property values are stringified by default, but you can override this behavior using the `&` modifier. This ensures that the value is passed as-is, preserving its original type.
 
 ```html
-<!-- template -->
+<!-- explicit attribute name -->
+
+<component userList users={{& users }} />
+```
+
+```html
+<!-- implicit attribute name -->
+
+<component userList ~& users />
+```
+
+> ℹ️ *You can combine `&` and `:` as long as the ampersand comes first.*
+
+---
+
+### Using properties and rendering block content
+
+Components allow you to define properties and render block content seamlessly. Properties are passed as attributes, while block content is defined between the opening and closing tags of the component. Inside the component, you can reference properties using `{{ propertyName }}` and block content using `{{@ children }}`.
+
+```html
+<!-- button component -->
+<button style="color: {{ color }}">{{@ children}}</button>
+```
+```html
+<!-- layout component -->
+<header>Header</header>
+<main>
+  <component button color="red">Click me</component>
+</main>
+<footer>Footer</footer>
+```
+
+> ℹ️ The provided block content can be rendered more than once.
+
+---
+
+## 🔌 Named slots
+
+Slots allow you to define specific areas within a component where custom content can be injected. This feature provides flexibility and control over the layout and design of your components, enabling you to create reusable and adaptable layout components.
+
+You can define **named slot content** using the `<render slot="name">` tag and consume it within a component using the `<slot name>` tag. This mechanism allows you to pass content from a parent component to a child component in a structured and predictable way.
+
+```html
+<!-- Parent: -->
 <component layout>
   <render slot="title">
     <h1>My Page</h1>
@@ -261,113 +371,218 @@ You can define **named slot content** using `<render slot="name">` and consume i
 ```
 
 ```html
-<!-- layout component -->
+<!-- Layout component: -->
 <header>
   <slot title>No title available</slot>
 </header>
 <main>{{@ children }}</main>
 ```
 
-> ℹ️ If a slot isn't rendered, the fallback content inside `<slot>` will be used instead. 
+Slots without fallback content can use self-closing tags, simplifying the structure and improving readability. A self-closing slot tag indicates that the slot is optional and will only render content if it is provided by the parent.
+
+```html
+<header>
+  <slot title />
+</header>
+<main>{{@ children }}</main>
+```
+
+> ℹ️ Combine named slots with block content to create highly customizable components.
 
 ---
 
-### 🔁 Rendering lists
+## 🔁 Rendering lists
 
-Forma includes built-in iteration via `<list>` and `<reverse-list>`:
+The `<list>` and `<reverse-list>` tags allow you to iterate over arrays of data, rendering each item within the specified block. The `as` attribute defines the name of the variable that represents the current item in the iteration. This variable is scoped locally to the block, ensuring no conflicts with other variables in your template.
 
 ```html
 <list users as="user">
   <li>{{: user.name }}</li>
 </list>
+```
 
-<reverse-list items as="item">
-  <p>{{: item }}</p>
+`<reverse-list>` works the same as `<list>`, but iterates over the array in reverse order:
+
+```html
+<reverse-list users as="user">
+  <p>{{: user.name }}</p>
 </reverse-list>
 ```
 
-All items are automatically scoped as the variable you define (e.g. `user`, `item`).
+You can nest `<list>` or `<reverse-list>` tags to iterate over nested arrays. Each nested block has its own scoped variable, ensuring clarity and avoiding conflicts.
+
+```html
+<list categories as="category">
+  <h2>{{: category.name }}</h2>
+  <list category.items as="item">
+    <p>{{: item.name }}</p>
+  </list>
+</list>
+```
+
+You can handle empty arrays by using the `<empty>` tag inside a `<list>` or `<reverse-list>` block:
+
+```html
+<list users as="user">
+  <li>{{: user.name }}</li>
+  <empty>
+    <p>No users found.</p>
+  </empty>
+</list>
+```
+
+> ℹ️ The `<empty>` block must be placed at the end of the `<list>` block.
+
+### Destructuring variables
+
+When rendering lists, each item is often an object containing multiple properties. To improve readability and reduce repetition, you can destructure object properties directly within the `as` attribute.
+
+```html
+<list users as="name, email, alias">
+  <p>{{: name }} ({{: alias }})</p>
+  <p>{{: email }}</p>
+</list>
+```
 
 ---
 
-### 🔀 Conditional rendering
+## 🔀 Conditional rendering
 
-Forma supports inline control flow with `<if>`, `<else-if>`, and `<else>`:
+Inline control flow can be achieved with `<if>`, `<else-if>`, and `<else>` tags. These tags enable you to conditionally render content based on dynamic values. These tags provide a clean and declarative way to handle conditional logic directly within your components.
+
+The `<if>` tag evaluates a variable and renders its content if the value is **truthy**:
 
 ```html
-<if condition="loggedIn">Welcome back!</if>
-<if not condition="loggedIn">Please log in.</if>
+<!-- Checks if `self.loggedIn` is truthy -->
 
-<if condition="a">
+<if condition={{ loggedIn }}>Welcome back!</if>
+```
+
+To handle the opposite case, you can use the `not` modifier:
+
+```html
+<!-- Checks if the local variable `loggedIn` is falsy -->
+
+<if not condition={{: loggedIn }}>Please log in.</if>
+```
+
+For more complex scenarios, you can chain conditions using `<else-if>` and `<else>` tags. This allows you to handle multiple cases in a structured and readable manner:
+
+```html
+<if condition={{ alpha }}>
   A is true
-<else-if condition="b">
+<else-if condition={{ beta }}>
   B is true
 <else>
   Neither is true...
 </if>
 ```
 
-Conditions default to `self.variableName`, but you can use local scoping with `:`:
+### Nesting conditions
+
+You can nest `<if>` blocks to handle more intricate logic. Each nested block evaluates its condition independently, allowing for highly customizable rendering:
 
 ```html
-<if condition=": someLocalVariable">...</if>
+<if condition={{ user }}>
+  <p>Welcome, {{ user.name }}!</p>
+  
+  <if condition={{ user.isAdmin }}>
+    <p>You have admin privileges.</p>
+  </if>
+<else>
+  <p>Please log in to continue.</p>
+</if>
 ```
 
 ---
 
-### 🔀 Switch-like conditional rendering
+## 🔀 Switch-like conditional rendering
 
-Switch-like conditional rendering evaluates a value against multiple cases, much like a traditional switch statement. This helps keep your templates clean and efficient, as the compiler optimizes these constructs into minimal render functions.
+Switch-like conditional rendering evaluates a value against multiple cases, much like a traditional switch statement. This helps keep your components clean and efficient, as the compiler optimizes these constructs into efficient code that evaluates conditions sequentially, ensuring fast and predictable performance.
+
+The `<when>` tag is used to define the variable being evaluated, while `<case>` tags specify the conditions to match. A `<default>` tag can be included to handle cases where no match is found.
 
 ```html
-<when variable="status">
+<when status>
   <case is="loading">Loading...</case>
   <case is="error">Something went wrong.</case>
   <default>Unknown status</default>
 </when>
 ```
 
-By default, the specified variable points to `self.variableName`, which is the provided data context. Adding a `:` before the variable name points it to a local variable instead.
+Switch-like rendering can be nested to handle more complex scenarios. Each nested `<when>` block evaluates its variable independently, allowing for highly customizable rendering.
+
+```html
+<when user.role>
+  <case is="admin">
+    <p>Welcome, admin!</p>
+
+    <when user.level>
+      <case is="1">
+        You have basic admin privileges.
+      </case>
+      <case is="2">
+        You have advanced admin privileges!
+      </case>
+    </when>
+  </case>
+  <case is="user">Welcome, user!</case>
+  <default>Please log in.</default>
+</when>
+```
+
+The `<default>` tag is optional but recommended to handle cases where no `<case>` matches. If omitted, no content will be rendered for unmatched cases.
+
+```html
+<when status>
+  <case is="success">
+    Operation successful!
+  </case>
+  <case is="error">
+    Operation failed.
+  </case>
+  
+  <!-- No default case -->
+</when>
+```
+
+> ℹ️ Use `<when>` tags for scenarios with multiple discrete conditions to improve readability and maintainability.
 
 ---
 
-### 🔄 Recursive components
+## 🔄 Recursive components
 
-Forma supports recursive components, allowing a component to call itself during rendering. This is particularly useful for scenarios like rendering nested menus, trees, or other hierarchical structures.
+> ⚠️ Recursive components should be used with caution to avoid infinite loops.
 
-> ⚠️ Recursive components should be used with caution to avoid infinite loops or excessive nesting that could impact performance.
+There is support for recursive components, which enables a template to call itself — useful for trees or nested structures. This feature is particularly beneficial when working with hierarchical data — for example, file systems, organizational charts, or nested menus. Recursive components allow you to define a single template that can handle any level of nesting, simplifying your code and improving maintainability.
+
+To use recursive components, ensure that the `recursive` flag is set to `true` during compilation. This flag enables the compiler to handle self-references within the template, ensuring that the component can call itself without causing errors.
+
+Here's an example of a recursive component for rendering a tree structure:
 
 ```html
 <h1>{{ title }}</h1>
 <ul>
   <list items as="item">
     <li>
-      <component self title="{: item.title }" items="{: item.items }" />
+      <component self ~:item.title ~:item.items />
+      <!-- the line above is equivalent to
+      <component self title={{: item.title }} items={{: item.items }} />
+      -->
     </li>
   </list>
 </ul>
 ```
 
-To enable recursion, set the `recursive` flag to `true` when compiling the component:
+In this example, the `tree` component calls itself for each child node, passing the appropriate data for the next level of the hierarchy. This approach ensures that the component can handle any depth of nesting dynamically.
 
-```js
-// we assume that `folder` contains the template above!
-const renderFunction = compile.toFunction(folder, {}, { recursive: true });
+> ℹ️ Excessive nesting or deeply recursive structures can impact performance, so always test your components with realistic data to ensure they perform as expected.
 
-const result = renderFunction(
-  {
-    title: 'Top dawg',
-    items: [
-      { title: 'Underdog', items: [ /* ... */ ] },
-      // imagine more items here...
-    ]
-  }
-);
-```
+When designing recursive components, it's important to include a termination condition to prevent infinite loops. For example, you might check whether a node has children before rendering further nested components. This ensures that the recursion stops at the appropriate level, avoiding performance issues or stack overflows.
 
-#### Recursive dependencies
+### Recursive dependencies
 
-To enable recursiveness in dependency components, they must be precompiled with the `recursive` flag set to `true`:
+Recursive dependency components must be precompiled with the `recursive` flag set to `true`:
 
 ```js
 const nodeComponent = compile.toString(nodeTemplate, {}, { recursive: true });
@@ -376,27 +591,59 @@ const treeComponent = compile.toFunction(treeTemplate, { node: nodeComponent });
 
 ---
 
-## 💡 Examples
+## ✨ Official file extension
 
-[Explore practical examples and usage instructions](https://github.com/erik-riklund/forma/blob/main/packages/compiler/docs/EXAMPLES.md) to get started.
+You are encouraged to use the `.fml` extension — short for _Forma Markup Language_.  
+
+The acronym might raise an eyebrow or two — but when composing templates is this smooth, you’ll be saying it for all the right reasons. 😄
+
+---
+
+## ⚡ Performance
+
+
+> _Forma isn’t just fast under pressure — **it’s composed.**_ 🥁
+
+*Performance tests will be added continuously to test resilience, speed, and scalability.*
+
+- Compiled and rendered a simple component **1,000** times in ~**60ms**
+- Rendered a **precompiled** component **100,000** times in ~**95ms**
+- Compiled **1,003** components and executed **3,001** total renders in ~**100ms**
+- Rendered a list with **100 items** using a precompiled component **1,000** times in ~**50ms**
+- Compiled and rendered a component with **100 dependencies**, **100** times in ~**400ms**
+- Rendered a deeply nested recursive component tree with **111,111 nodes** in ~**150ms**
+
+### 🛠️ Simulated production tests
+
+- Rendered a blog index with **100,000** posts in **~190ms**
+- Rendered a full product grid with **100,000** items in **~250ms**
+
+> ℹ️ All tests were conducted using the [Bun](https://bun.sh/) runtime.
 
 ---
 
 ## 🧐 How it works
 
-The compiler takes your template code and transforms it into JavaScript render functions. These functions utilize [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) to generate HTML strings directly — no virtual DOM, no runtime template parsing. This approach ensures minimal overhead and maximum performance, making Forma an excellent choice for server-side rendering.
+The compiler takes your template code and transforms it into JavaScript render functions. These functions utilize [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) to generate HTML strings directly — no virtual DOM, no runtime template parsing. This approach ensures minimal overhead and maximum performance, making it an excellent choice for server-side rendering.
 
-### A very basic template
+### Example: Rendering a list with fallback content
 
-Let's assume that we have the following template:
+To see how the compiler works in practice, consider this template that displays a list of users. If the list is empty, it falls back to a default message:
 
 ```html
-Hello world
+<ul>
+  <list users as="user">
+    <li>{{: user.name }}</li>
+    <empty>
+      <li>There are no users.</li>
+    </empty>
+  </list>
+</ul>
 ```
 
-After being compiled, it's transformed to a render function that is safe to cache and reuse in any server-rendered context. 
+This is compiled into a render function that outputs a complete HTML string. The generated function is entirely static, side-effect-free, and safe to cache and reuse in any server-rendered context.
 
-> It is most likely safe to use in browsers as well, but this isn't actively tested as it's outside the project's scope. 🔍
+> ⚠️ Usage of the render functions in browsers is not actively tested.
 
 ```js
 (self, parent) => {
@@ -405,24 +652,37 @@ After being compiled, it's transformed to a render function that is safe to cach
   self.__slots = [];
 
   const v = (t) => typeof t === 'function' ? t() : t;
-  const e = (t) => typeof t === 'string' && t.replaceAll('<','&lt;').replaceAll('>','&gt;') || t;
+  const c = (a, b) => typeof a === 'number' ? a === parseInt(b) : a === b;
+  const s = (t) => typeof t !== 'string' && t !== null && t !== undefined ? t.toString() : t;
+  const e = (t) => typeof t === 'string' && t.replaceAll('<', '&lt;').replaceAll('>', '&gt;') || t;
   const r = (t) => t !== false && t !== null && t !== undefined;
-  const c = (a,b) => typeof a=== 'number' ? a === parseInt(b) : a === b;
-  
+
   if (self.__children) {
     self.__children_r = self.__children();
   }
-  return `Hello world`;
-};
+
+  return `<ul>${
+    (() => {
+      let o = '';
+      const l = v(typeof users !== 'undefined' && users || self.users) || [];
+      for (const user of l) {
+        o += `<li>${e(s(v((typeof user !== 'undefined' ? user?.name : null) || '')))}</li>`;
+      }
+      if (!o.length) {
+        o = `<li>There are no users.</li>`;
+      }
+      return o;
+    })()
+  }</ul>`;
+}
 ```
 
-The helper functions (`v`, `e`, `r`, and `c`) are injected into every compiled template:
-- `v`: safely resolves function values
-- `e`: encodes HTML
-- `r`: evaluates truthiness
-- `c`: compares switch values
+The compiler injects a set of lightweight utility functions into every top-level render function to ensure that they are self-contained. These helpers are pure and side-effect-free.
 
-They are always present, even when not used, as each template is self-contained. They are harmless and will not add a significant overhead to the rendering process.
+- `v()` resolves dynamic values safely (e.g., unwrapping functions)
+- `e()` escapes HTML to prevent injection
+- `r()` checks whether a value is "renderable" (truthy and defined)
+- `c()` compares values in conditional constructs
 
 ---
 

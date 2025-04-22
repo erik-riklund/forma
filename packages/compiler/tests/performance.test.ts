@@ -99,7 +99,7 @@ it.skip('compiles and renders a component with two dependencies 1,000 times',
  * each iteration, confirming that the rendering process is accurate and efficient
  * when handling lists with multiple items.
  * 
- * Execution time: ~50ms
+ * Execution time: ~30ms
  */
 it.skip('renders a list with 100 items using a precompiled component 1000 times',
   () =>
@@ -166,7 +166,7 @@ it.skip('compiles and renders a component and its 100 dependencies 100 times',
  * node and the deepest node, confirming that the recursive rendering process is accurate
  * and efficient for large hierarchical structures.
  * 
- * Execution time: ~150ms
+ * Execution time: ~110ms
  */
 it.skip('renders a deep tree (111,111 nodes) using a recursive component',
   () =>
@@ -187,7 +187,7 @@ it.skip('renders a deep tree (111,111 nodes) using a recursive component',
     };
 
     const node = '<h3>{{ label }}</h3><ul><li><list children as="child">' +
-      '<component self label="{:child.label}" children="{:child.children}" /></list></li></ul>';
+      '<component self label="{{:child.label}}" children="{{o:child.children}}"/></list></li></ul>';
 
     const renderFunction = compile.toFunction(node, undefined, { recursive: true });
     const result = renderFunction({ label: 'Node 1', children: createNodes('1', 5, 10) });
@@ -198,31 +198,117 @@ it.skip('renders a deep tree (111,111 nodes) using a recursive component',
 );
 
 /**
- * ?
+ * This test evaluates the performance and correctness of rendering a full blog
+ * index page with 25,000 posts. The blog page is structured using a layout component
+ * that includes a header slot for the title and a section for the list of posts.
+ * 
+ * Each post is rendered using a post component that displays the title, summary,
+ * and author. The test ensures that the rendered output includes the expected
+ * content for the first and last posts, as well as the main layout structure,
+ * confirming that the rendering process is accurate and efficient for large datasets.
+ * 
+ * Execution time: ~180ms
  */
-it.todo('renders 10,000 components, each with three named slots',
+it.skip('renders a full blog index page with 100,000 posts',
   () =>
   {
+    const layout = `
+    <main>
+      <header><slot title>No Title</slot></header>
+      <section>{{@ children }}</section>
+    </main>
+  `;
 
+    const post = `
+    <article>
+      <h2>{{ title }}</h2>
+      <p>{{ summary }}</p>
+      <footer>By {{ author }}</footer>
+    </article>
+  `;
+
+    const template = `
+    <component layout>
+      <render slot="title">Blog</render>
+      <list posts as="post">
+        <component post title="{{:post.title}}" summary="{{:post.summary}}" author="{{:post.author}}" />
+      </list>
+    </component>
+  `;
+
+    const posts = Array.from({ length: 100_000 },
+      (_, i) => ({
+        title: `Post ${ i + 1 }`,
+        summary: `Summary for post ${ i + 1 }`,
+        author: `Author ${ i + 1 }`
+      })
+    );
+
+    const renderFunction = compile.toFunction(template, { layout, post });
+    const html = renderFunction({ posts });
+
+    expect(html).toContain('<h2>Post 1</h2>');
+    expect(html).toContain('<h2>Post 100000</h2>');
+    expect(html).toContain('<main>');
   }
 );
 
-// it('renders 10,000 components each with 3 named slots', () => {
-//   const layout = `
-//     <header><slot title /></header>
-//     <section><slot content /></section>
-//     <footer><slot footer /></footer>
-//   `;
-//   const template = Array.from({ length: 10_000 }, (_, i) => `
-//     <component layout>
-//       <render slot="title"><h1>Title ${i}</h1></render>
-//       <render slot="content"><p>Body ${i}</p></render>
-//       <render slot="footer"><small>End ${i}</small></render>
-//     </component>
-//   `).join('');
+/**
+ * ?
+ * 
+ * Execution time: ~230ms
+ */
+it.skip('renders a product grid with 100,000 cards',
+  () =>
+  {
+    const layout = `
+    <section>
+      <header><slot title>No title</slot></header>
+      <div class="grid">{{@ children }}</div>
+    </section>
+  `;
 
-//   const renderFunction = compile.toFunction(template, { layout });
-//   const result = renderFunction();
+    const productCard = `
+    <article class="product">
+      <h2>{{ name }}</h2>
+      <p>{{ description }}</p>
+      <p class="price">{{ price }}</p>
 
-//   expect(result).toContain('Title 9999');
-// });
+      <if condition="onSale"><span class="badge">On Sale</span></if>
+      <if condition="outOfStock"><span class="badge danger">Out of stock</span></if>
+    </article>
+  `;
+
+    const template = `
+    <component layout>
+      <render slot="title"><h1>All Products</h1></render>
+      <list products as="product">
+        <component productCard
+          name="{{:product.name}}"
+          description="{{:product.description}}"
+          price="{{:product.price}}"
+          onSale="{{:product.onSale}}"
+          outOfStock="{{:product.outOfStock}}" />
+      </list>
+    </component>
+  `;
+
+    const products = Array.from({ length: 100_000 },
+      (_, i) => ({
+        name: `Product ${ i + 1 }`,
+        description: `Description for product ${ i + 1 }`,
+        price: `$${ (i + 1) * 1.1 }`,
+        onSale: i % 10 === 0,
+        outOfStock: i % 17 === 0
+      })
+    );
+
+    const renderFunction = compile.toFunction(template, { layout, productCard });
+    const result = renderFunction({ products });
+
+    expect(result).toContain('Product 1');
+    expect(result).toContain('On Sale');
+    expect(result).toContain('Out of stock');
+    expect(result).toContain('Product 10000');
+  }
+);
