@@ -4,31 +4,7 @@
 
 ### Flexible by default, customizable by design. 🧩
 
-**Forma Load** is the official loader module for Forma templates. It provides a flexible and efficient way to manage and load templates in your applications. With its modular design, you can choose to use an existing adapter or create a new one specifically tailored to your project.
-
-## 📦 Installation
-
-> Note: This package is not released yet. 🚧
-
-To install the loader, use your preferred `npm`-compatible package manager:
-
-```bash
-npm install forma-load
-```
-
-> The manager preferred by Forma is [Bun](https://bun.sh/).
-
-## Usage
-
-Import and use the loader, and the selected adapter, in your project:
-
-```javascript
-import { useLoader } from 'forma-load';
-import { fileLoader } from 'forma-load/adapters/filesystem';
-
-const loader = useLoader(fileLoader);
-const template = await loader.fetchTemplate('path/to/template.fml');
-```
+**Forma Load** is the loader module for the Forma suite. It provides a flexible and efficient way to manage and load templates in your applications. With its modular design, you can choose to use an existing adapter or create a new one specifically tailored to your project.
 
 ## ❤️ License: MIT
 

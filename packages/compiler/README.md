@@ -123,6 +123,29 @@ The compiler supports more advanced features as well, such as fallback values fo
 
 ---
 
+## ⚡ Performance
+
+
+> _Forma isn’t just fast under pressure — **it’s composed.**_ 🥁
+
+*Performance tests will be added continuously to test resilience, speed, and scalability.*
+
+- Compiled and rendered a simple component **1,000** times in ~**60ms**
+- Rendered a **precompiled** component **100,000** times in ~**95ms**
+- Compiled **1,003** components and executed **3,001** total renders in ~**100ms**
+- Rendered a list with **100 items** using a precompiled component **1,000** times in ~**50ms**
+- Compiled and rendered a component with **100 dependencies**, **100** times in ~**400ms**
+- Rendered a deeply nested recursive component tree with **111,111 nodes** in ~**150ms**
+
+### 🛠️ Simulated production tests
+
+- Rendered a blog index with **100,000** posts in **~190ms**
+- Rendered a full product grid with **100,000** items in **~250ms**
+
+> ℹ️ All tests were conducted using the [Bun](https://bun.sh/) runtime.
+
+---
+
 ## 📦 Installation
 
 To install Forma Compile, use your preferred package manager:
@@ -599,26 +622,24 @@ The acronym might raise an eyebrow or two — but when composing templates is th
 
 ---
 
-## ⚡ Performance
+### Syntax highlighting
 
+> ℹ️ This section is focused on [Visual Studio Code](https://code.visualstudio.com) as the IDE.
 
-> _Forma isn’t just fast under pressure — **it’s composed.**_ 🥁
+The first step to improving the developer experience is to enable HTML highlighting in `.fml` files. This can be achieved by adding the following line to `.vscode/settings.json`:
 
-*Performance tests will be added continuously to test resilience, speed, and scalability.*
+```json
+"files.associations": { "*.fml": "html" }
+```
 
-- Compiled and rendered a simple component **1,000** times in ~**60ms**
-- Rendered a **precompiled** component **100,000** times in ~**95ms**
-- Compiled **1,003** components and executed **3,001** total renders in ~**100ms**
-- Rendered a list with **100 items** using a precompiled component **1,000** times in ~**50ms**
-- Compiled and rendered a component with **100 dependencies**, **100** times in ~**400ms**
-- Rendered a deeply nested recursive component tree with **111,111 nodes** in ~**150ms**
+There is no official extension available at this moment. What we propose is to use the excellent [Highlight extension](https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-highlight) with the following regular expressions below to enhance your development experience. These are also placed in the projects `.vscode/settings.json`.
 
-### 🛠️ Simulated production tests
+```json
+"highlight.regexes":
+{
 
-- Rendered a blog index with **100,000** posts in **~190ms**
-- Rendered a full product grid with **100,000** items in **~250ms**
-
-> ℹ️ All tests were conducted using the [Bun](https://bun.sh/) runtime.
+}
+```
 
 ---
 
@@ -649,11 +670,10 @@ This is compiled into a render function that outputs a complete HTML string. The
 (self, parent) => {
   self = self || {};
   parent = parent || {};
-  self.__slots = [];
 
   const v = (t) => typeof t === 'function' ? t() : t;
   const c = (a, b) => typeof a === 'number' ? a === parseInt(b) : a === b;
-  const s = (t) => typeof t !== 'string' && t !== null && t !== undefined ? t.toString() : t;
+  const s = (t) => typeof t !== 'string' ? t?.toString() : t;
   const e = (t) => typeof t === 'string' && t.replaceAll('<', '&lt;').replaceAll('>', '&gt;') || t;
   const r = (t) => t !== false && t !== null && t !== undefined;
 

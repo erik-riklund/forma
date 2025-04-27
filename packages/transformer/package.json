@@ -1,0 +1,13 @@
+{
+  "type": "module",
+  "private": true,
+  "name": "forma-transform",
+  "version": "0.1",
+  "scripts": {
+    "test": "bun test --watch"
+  },
+  "dependencies": {
+    "forma-compile": "workspace:*",
+    "forma-load": "workspace:*"
+  }
+}

@@ -1,28 +1,9 @@
 {
+  "private": true,
   "type": "module",
   "name": "forma-load",
-  "version": "0.1.0",
-  "description": "?",
-  "keywords": [ "forma", "template", "loader", "ssr", "html" ],
-  "author": "Erik Riklund (Gopher)",
-  "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "files": [ "dist" ],
-  "repository": { "type": "git", "url": "https://github.com/erik-riklund/forma" },
-  "bugs": { "url": "https://github.com/erik-riklund/forma/issues" },
-  "homepage": "https://github.com/erik-riklund/forma/tree/main/packages/loader",
+  "version": "0.1",
   "scripts": {
-    "build": "npm-run-all --parallel \"dist\" \"dist-*\"",
-    "dist": "bun build --minify --outdir dist --target node source/index.ts",
-    "dist-adapter-filesystem": "bun build --minify --outdir dist/adapters --target node source/adapters/filesystem.ts",
     "test": "bun test --watch"
   }
 }

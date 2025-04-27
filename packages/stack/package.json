@@ -1,0 +1,27 @@
+{
+  "type": "module",
+  "name": "forma-stack",
+  "version": "0.1-alpha",
+  "description": "?",
+  "keywords": [ "forma", "stack", "ssr", "html"],
+  "author": "Erik Riklund (Gopher)",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [ "dist" ],
+  "sideEffects": false,
+  "repository": { "type": "git", "url": "https://github.com/erik-riklund/forma" },
+  "bugs": { "url": "https://github.com/erik-riklund/forma/issues" },
+  "homepage": "https://github.com/erik-riklund/forma/tree/main/packages/stack",
+  "scripts": {
+    "build": "bun build --minify --outdir dist --target node source/index.ts",
+    "test": "bun test --watch"
+  }
+}

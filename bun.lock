@@ -10,11 +10,23 @@
     },
     "packages/compiler": {
       "name": "forma-compile",
-      "version": "1.1.0",
+      "version": "2.0.0",
     },
     "packages/loader": {
       "name": "forma-load",
-      "version": "0.1.0",
+    },
+    "packages/server": {
+      "name": "forma-server",
+    },
+    "packages/stack": {
+      "name": "forma-stack",
+    },
+    "packages/transformer": {
+      "name": "forma-transform",
+      "dependencies": {
+        "forma-compile": "workspace:*",
+        "forma-load": "workspace:*",
+      },
     },
   },
   "packages": {
@@ -89,6 +101,12 @@
     "forma-compile": ["forma-compile@workspace:packages/compiler"],
 
     "forma-load": ["forma-load@workspace:packages/loader"],
+
+    "forma-server": ["forma-server@workspace:packages/server"],
+
+    "forma-stack": ["forma-stack@workspace:packages/stack"],
+
+    "forma-transform": ["forma-transform@workspace:packages/transformer"],
 
     "function-bind": ["function-bind@1.1.2", "", {}, "sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA=="],
 
