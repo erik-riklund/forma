@@ -18,6 +18,8 @@ import { middleware } from './middleware';
  */
 export const useServer = ({ routes, middlewares }: ServerConfig) =>
 {
+  // handle the static file options.
+
   serve(
     {
       routes:
