@@ -1,10 +1,10 @@
 {
   "type": "module",
   "private": true,
-  "name": "forma-touch",
+  "name": "forma-automate",
   "version": "0.1-alpha",
   "description": "?",
-  "keywords": [ "forma", "touch", "client", "js"],
+  "keywords": [ "forma", "automate", "tasks", "js"],
   "author": "Erik Riklund (Gopher)",
   "license": "MIT",
   "main": "dist/index.js",
@@ -20,7 +20,7 @@
   "sideEffects": false,
   "repository": { "type": "git", "url": "https://github.com/erik-riklund/forma" },
   "bugs": { "url": "https://github.com/erik-riklund/forma/issues" },
-  "homepage": "https://github.com/erik-riklund/forma/tree/main/packages/touch",
+  "homepage": "https://github.com/erik-riklund/forma/tree/main/packages/automate",
   "scripts": {
     "build": "bun build --minify --outdir dist --target node source/index.ts",
     "test": "bun test --watch"

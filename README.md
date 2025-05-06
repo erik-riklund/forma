@@ -5,7 +5,7 @@
 ### Build with structure, render with purpose. 🚀  
 > _Please note that this project is a work in progress_ 😃
 
-The **Forma Suite** is a collection of modular, purpose-driven tools designed to streamline the development of server-rendered applications.
+The **Forma Suite** is a collection of purpose-driven tools designed to streamline the development of server-rendered applications.
 
 | Package            | Description |
 |--------------------|-------------|
@@ -15,9 +15,11 @@ The **Forma Suite** is a collection of modular, purpose-driven tools designed to
 | | <span style="font-size: 90%">_No dependencies._</span> |
 | [`forma-transform`](https://github.com/erik-riklund/forma/tree/main/packages/transform) | Transform raw templates into compiled render functions or strings. |
 | | <span style="font-size: 90%">_Dependencies:_ `forma-compile`, `forma-load`</span> |
+| [`forma-automate`](https://github.com/erik-riklund/forma/tree/main/packages/automate) | ? |
+| | <span style="font-size: 90%">_No dependencies._</span> |
 | [`forma-server`](https://github.com/erik-riklund/forma/tree/main/packages/server) | ? |
 | | <span style="font-size: 90%">_No dependencies._</span> |
 | [`forma-touch`](https://github.com/erik-riklund/forma/tree/main/packages/touch) | ? |
 | | <span style="font-size: 90%">_No dependencies._</span> |
 | [`forma-stack`](https://github.com/erik-riklund/forma/tree/main/packages/stack) | ? |
-| | <span style="font-size: 90%">_Dependencies:_ `forma-transform`, `forma-server`, `forma-touch`</span> |
+| | <span style="font-size: 90%">_Dependencies:_ `forma-transform`, `forma-server`, `forma-automate`, `forma-touch`</span> |
