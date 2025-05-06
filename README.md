@@ -13,13 +13,15 @@ The **Forma Suite** is a collection of purpose-driven tools designed to streamli
 | | <span style="font-size: 90%">_No dependencies._</span> |
 | [`forma-load`](https://github.com/erik-riklund/forma/tree/main/packages/load) | Load templates using adapters. |
 | | <span style="font-size: 90%">_No dependencies._</span> |
-| [`forma-transform`](https://github.com/erik-riklund/forma/tree/main/packages/transform) | Transform raw templates into compiled render functions or strings. |
+| [`forma-build`](https://github.com/erik-riklund/forma/tree/main/packages/build) | Precompile templates for enhanced performance. |
 | | <span style="font-size: 90%">_Dependencies:_ `forma-compile`, `forma-load`</span> |
 | [`forma-automate`](https://github.com/erik-riklund/forma/tree/main/packages/automate) | ? |
 | | <span style="font-size: 90%">_No dependencies._</span> |
-| [`forma-server`](https://github.com/erik-riklund/forma/tree/main/packages/server) | ? |
+| [`forma-serve`](https://github.com/erik-riklund/forma/tree/main/packages/server) | ? |
+| | <span style="font-size: 90%">_No dependencies._</span> |
+| [`forma-store`](https://github.com/erik-riklund/forma/tree/main/packages/store) | ? |
 | | <span style="font-size: 90%">_No dependencies._</span> |
 | [`forma-touch`](https://github.com/erik-riklund/forma/tree/main/packages/touch) | ? |
 | | <span style="font-size: 90%">_No dependencies._</span> |
 | [`forma-stack`](https://github.com/erik-riklund/forma/tree/main/packages/stack) | ? |
-| | <span style="font-size: 90%">_Dependencies:_ `forma-transform`, `forma-server`, `forma-automate`, `forma-touch`</span> |
+| | <span style="font-size: 90%">_Dependencies:_ `forma-automate`, `forma-build`, `forma-serve`, `forma-store`, `forma-touch`</span> |
