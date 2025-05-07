@@ -5,7 +5,7 @@
 ### Build with structure, render with purpose. 🚀  
 > _Please note that this project is a work in progress_ 😃
 
-The **Forma Suite** is a collection of purpose-driven tools designed to streamline the development of server-rendered applications.
+The **Forma** suite is a collection of purpose-driven tools designed to streamline the development of server-rendered applications.
 
 | Package            | Description |
 |--------------------|-------------|
