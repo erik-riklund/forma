@@ -8,35 +8,39 @@ import type {
 } from './types';
 
 import { file, serve } from 'bun';
-import { middleware } from './middleware';
 
 /**
  * Creates a server instance using the HTTP server provided by Bun.
  * 
- * @param routes - The routes to be registered.
- * @param middlewares - The middlewares to be applied.
+ * @param config - The server configuration object containing routes, middlewares, and other settings.
  */
-export const useServer = ({ routes, middlewares }: ServerConfig) =>
+export const useServer = (
+  { assets, middlewares, port, routes }: ServerConfig) =>
 {
-  // handle the static file options.
+  const assetOptions = {
+    folder: assets?.folder || './assets',
+    route: assets?.route || '/assets/*'
+  };
 
   serve(
     {
       routes:
       {
-        '/assets/*':
+        [assetOptions.route]:
         {
           GET: (request) =>
           {
             const url = new URL(request.url);
-            const path = url.pathname.replace(/^\/assets\//, '');
+            const path = url.pathname.substring(assetOptions.route.length - 1);
 
-            return staticFileResponse(path);
+            return staticFileResponse(`${ assetOptions.folder }/${ path }`);
           },
         },
 
         ...createRoutePipelines(routes, middlewares)
-      }
+      },
+
+      port: process.env.PORT || port || 800,
     }
   );
 };
@@ -52,6 +56,12 @@ const createRoutePipelines = (routes: RouteDeclaration[],
 {
   const pipelines: RoutePipelines = {};
 
+  /**
+   * Creates a middleware stack for a given route path.
+   * 
+   * @param routePath - The path of the route for which to create the middleware stack.
+   * @return An array of middleware handlers that should be executed for the given route path.
+   */
   const createMiddlewareStack = (routePath: string) =>
   {
     const stack: MiddlewareHandler[] = [];
@@ -67,6 +77,9 @@ const createRoutePipelines = (routes: RouteDeclaration[],
     return stack;
   };
 
+  /**
+   * Creates a pipeline for each route, combining the middleware and the route handler.
+   */
   for (const { path, method, handler } of routes)
   {
     const middlewareStack = createMiddlewareStack(path);
@@ -105,7 +118,7 @@ export const jsonResponse = (data: unknown) =>
   return new Response(JSON.stringify(data), {
     headers: { 'Content-Type': 'application/json; charset=utf-8' }
   });
-}
+};
 
 /**
  * Creates a `Response` object with HTML content and appropriate headers.
@@ -130,7 +143,7 @@ const staticFileResponse = async (filePath: string) =>
 {
   try
   {
-    const assetFile = file(`./@app/assets/${ filePath }`);
+    const assetFile = file(filePath);
     const fileExists = await assetFile.exists();
 
     return new Response(
@@ -142,8 +155,3 @@ const staticFileResponse = async (filePath: string) =>
     return new Response(null, { status: 500 });
   }
 };
-
-/**
- * Centralize exports for the server module.
- */
-export { middleware };
