@@ -60,6 +60,22 @@ export interface RequestContext
   data: Record<string, unknown>;
 
   /**
+   * Utility method for sending a HTML response.
+   * 
+   * @param content - The HTML content to be returned.
+   * @returns A promise that resolves to a `Response` object containing the HTML content.
+   */
+  html: (content: string) => Response;
+
+  /**
+   * Utility method for sending a JSON response.
+   * 
+   * @param data - The JSON data to be returned.
+   * @returns A promise that resolves to a `Response` object containing the JSON data.
+   */
+  json: (data: unknown) => Response;
+
+  /**
    * The request object containing information about the incoming HTTP request.
    */
   request: BunRequest;
@@ -92,7 +108,7 @@ export interface ServerConfig
    * A list of middleware declarations that will be applied to incoming requests.
    * Each middleware declaration should specify the path and handler function for that middleware.
    */
-  middlewares: MiddlewareDeclaration[];
+  middlewares?: MiddlewareDeclaration[];
 
   /**
    * Defines the port on which the server will listen for incoming requests.

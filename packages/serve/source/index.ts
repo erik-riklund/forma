@@ -7,7 +7,9 @@ import type {
   ServerConfig
 } from './types';
 
-import { file, serve } from 'bun';
+import { file, serve, type BunRequest } from 'bun';
+export { HttpMethod } from './types.d';
+export { middleware } from './middleware';
 
 /**
  * Creates a server instance using the HTTP server provided by Bun.
@@ -37,7 +39,7 @@ export const useServer = (
           },
         },
 
-        ...createRoutePipelines(routes, middlewares)
+        ...createRoutePipelines(routes, middlewares || []),
       },
 
       port: process.env.PORT || port || 800,
@@ -78,6 +80,19 @@ const createRoutePipelines = (routes: RouteDeclaration[],
   };
 
   /**
+   * Creates a request context object that contains the request and response methods.
+   */
+  const createRequestContext = (request: BunRequest): RequestContext =>
+  {
+    const methods = {
+      json: (data: unknown) => jsonResponse(data),
+      html: (content: string) => htmlResponse(content)
+    };
+
+    return { request, data: {}, ...methods };
+  };
+
+  /**
    * Creates a pipeline for each route, combining the middleware and the route handler.
    */
   for (const { path, method, handler } of routes)
@@ -88,7 +103,7 @@ const createRoutePipelines = (routes: RouteDeclaration[],
     {
       [method as string]: async (request) =>
       {
-        const context: RequestContext = { request, data: {} };
+        const context = createRequestContext(request);
 
         for (const middleware of middlewareStack)
         {
