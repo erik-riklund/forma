@@ -1,10 +1,5 @@
 {
   "private": true,
   "type": "module",
-  "name": "forma-automate",
-  "scripts": {
-    "build": "npm-run-all --parallel \"dist\" \"dist-*\"",
-    "dist": "bun build --minify --outdir dist --target node source/index.ts",
-    "test": "bun test --watch"
-  }
+  "name": "forma-automate"
 }

@@ -2,7 +2,6 @@
   "private": true,
   "type": "module",
   "name": "forma-load",
-  "version": "0.1",
   "scripts": {
     "test": "bun test --watch"
   }

@@ -15,13 +15,13 @@ The **Forma** suite is a collection of purpose-driven tools designed to streamli
 | | <span style="font-size: 90%">_No dependencies._</span> |
 | [`forma-build`](https://github.com/erik-riklund/forma/tree/main/packages/build) | Precompile templates for enhanced performance. |
 | | <span style="font-size: 90%">_Dependencies:_ `forma-compile`, `forma-load`</span> |
-| [`forma-automate`](https://github.com/erik-riklund/forma/tree/main/packages/automate) | ? |
+| [`forma-automate`](https://github.com/erik-riklund/forma/tree/main/packages/automate) | Create and run automated tasks to streamline your workflow. |
 | | <span style="font-size: 90%">_No dependencies._</span> |
-| [`forma-serve`](https://github.com/erik-riklund/forma/tree/main/packages/server) | ? |
-| | <span style="font-size: 90%">_No dependencies._</span> |
+| [`forma-serve`](https://github.com/erik-riklund/forma/tree/main/packages/server) | Serve your application using a highly performant HTTP server. |
+| | <span style="font-size: 90%">_Dependencies:_ `Bun`</span> |
 | [`forma-store`](https://github.com/erik-riklund/forma/tree/main/packages/store) | ? |
 | | <span style="font-size: 90%">_No dependencies._</span> |
-| [`forma-touch`](https://github.com/erik-riklund/forma/tree/main/packages/touch) | ? |
+| [`forma-hydrate`](https://github.com/erik-riklund/forma/tree/main/packages/hydrate) | ? |
 | | <span style="font-size: 90%">_No dependencies._</span> |
 | [`forma-stack`](https://github.com/erik-riklund/forma/tree/main/packages/stack) | ? |
-| | <span style="font-size: 90%">_Dependencies:_ `forma-automate`, `forma-build`, `forma-serve`, `forma-store`, `forma-touch`</span> |
+| | <span style="font-size: 90%">_Dependencies:_ `forma-automate`, `forma-build`, `forma-serve`, `forma-store`, `forma-hydrate`</span> |
