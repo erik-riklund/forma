@@ -36,6 +36,9 @@
     },
     "packages/stack": {
       "name": "forma-stack",
+      "dependencies": {
+        "forma-serve": "workspace:*",
+      },
     },
     "packages/store": {
       "name": "forma-store",
