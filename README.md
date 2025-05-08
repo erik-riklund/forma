@@ -17,7 +17,7 @@ The **Forma** suite is a collection of purpose-driven tools designed to streamli
 | | <span style="font-size: 90%">_Dependencies:_ `forma-compile`, `forma-load`</span> |
 | [`forma-automate`](https://github.com/erik-riklund/forma/tree/main/packages/automate) | Create and run automated tasks to streamline your workflow. |
 | | <span style="font-size: 90%">_No dependencies._</span> |
-| [`forma-serve`](https://github.com/erik-riklund/forma/tree/main/packages/server) | Serve your application using a highly performant HTTP server. |
+| [`forma-serve`](https://github.com/erik-riklund/forma/tree/main/packages/server) | Serve an application using a highly performant HTTP server. |
 | | <span style="font-size: 90%">_Dependencies:_ `Bun`</span> |
 | [`forma-store`](https://github.com/erik-riklund/forma/tree/main/packages/store) | ? |
 | | <span style="font-size: 90%">_No dependencies._</span> |
