@@ -2,10 +2,13 @@
   "private": true,
   "type": "module",
   "name": "forma-stack",
+  "main": "dist/index.js",
   "dependencies": {
+    "forma-automate": "workspace:*",
     "forma-serve": "workspace:*"
   },
   "scripts": {
+    "bundle": "bun build --bundle --target bun --outdir dist source/index.ts",
     "serve": "bun --watch source/index.ts"
   }
 }
