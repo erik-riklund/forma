@@ -1,9 +1,0 @@
-{
-  "private": true,
-  "type": "module",
-  "name": "forma-build",
-  "dependencies": {
-    "forma-compile": "workspace:*",
-    "forma-load": "workspace:*"
-  }
-}

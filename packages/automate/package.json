@@ -1,6 +1,0 @@
-{
-  "private": true,
-  "type": "module",
-  "name": "forma-automate",
-  "main": "source/index.ts"
-}

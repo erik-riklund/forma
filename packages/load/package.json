@@ -1,8 +1,0 @@
-{
-  "private": true,
-  "type": "module",
-  "name": "forma-load",
-  "scripts": {
-    "test": "bun test --watch"
-  }
-}
