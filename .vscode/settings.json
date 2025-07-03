@@ -24,5 +24,10 @@
   "typescript.format.insertSpaceBeforeFunctionParenthesis": true,
   "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
   "typescript.format.placeOpenBraceOnNewLineForControlBlocks": true,
-  "typescript.format.placeOpenBraceOnNewLineForFunctions": true
+  "typescript.format.placeOpenBraceOnNewLineForFunctions": true,
+
+  // Options controlling the formatting of HTML files.
+  "html.format.enable": true,
+  "html.format.wrapAttributes": "auto",
+  "html.format.indentInnerHtml": true
 }
