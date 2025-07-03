@@ -22,8 +22,6 @@ import { makeFolderObject } from './folder'
 /**
  * Creates a file system handler object that uses the provided
  * file system object to interact with files and folders.
- * 
- * @version 1.0.0
  */
 export const makeFileSystemHandler = (fileSystem: FileHandler.FileSystem) =>
 {
